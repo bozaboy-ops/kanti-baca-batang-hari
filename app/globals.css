@@ -70,3 +70,42 @@ body {
     break-inside: avoid;
   }
 }
+@keyframes kanti-drift {
+  from { transform: translateX(-14px); }
+  to { transform: translateX(18px); }
+}
+@keyframes kanti-sail {
+  0% { transform: translate(0, 0) rotate(-2deg); }
+  50% { transform: translate(46px, -10px) rotate(2deg); }
+  100% { transform: translate(0, 0) rotate(-2deg); }
+}
+@keyframes kanti-bob {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+  50% { transform: translate(-50%, -50%) translateY(-7px); }
+}
+.map-cloud {
+  animation: kanti-drift 7s ease-in-out infinite alternate;
+}
+.map-boat {
+  animation: kanti-sail 9s ease-in-out infinite;
+}
+.map-pin {
+  animation: kanti-bob 3.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-cloud, .map-boat, .map-pin {
+    animation: none;
+  }
+}.map-pin-icon {
+  transition: transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .group:hover .map-pin-icon {
+    transform: scale(1.1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .map-pin-icon {
+    transition: none;
+  }
+}

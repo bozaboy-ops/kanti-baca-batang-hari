@@ -269,47 +269,92 @@ export default function HomePage() {
         </div>
       )}
 
-      <section aria-label="Pilih cerita lewat peta Batang Hari" className="lux-card mt-8 rounded-[1.75rem] p-5 sm:p-6">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="font-display text-2xl font-semibold text-emerald-950">Pilih Cerita Lewat Peta</h2>
-            <p className="mt-1 text-emerald-800">Ketuk nama kecamatan untuk menyaring ceritanya. Peta ilustrasi, bukan peta resmi berskala.</p>
+      <section aria-label="Pilih cerita lewat peta Batang Hari" className="lux-card mt-8 overflow-hidden rounded-[1.75rem]">
+        <div className="px-5 pt-5 sm:px-6">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="font-display text-2xl font-semibold text-emerald-950">Peta Petualangan Batang Hari</h2>
+              <p className="mt-1 text-emerald-800">Ikuti sungai, ketuk tempat berwarna, lalu pilih ceritanya. Ayo berpetualang bersama Alif!</p>
+            </div>
+            <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">8 TEMPAT · 13 CERITA</span>
           </div>
-          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">8 KECAMATAN</span>
         </div>
-        <div className="relative mt-5 h-80 overflow-hidden rounded-[1.25rem] border border-emerald-900/10 bg-emerald-50 sm:h-96">
-          <svg viewBox="0 0 800 420" className="absolute inset-0 h-full w-full" aria-hidden="true" preserveAspectRatio="none">
-            <path d="M-20 300 C140 250, 240 330, 390 260 S650 150, 830 190" fill="none" stroke="#74c0fc" strokeWidth="34" strokeLinecap="round" opacity="0.75" />
-            <path d="M120 -20 C180 110, 130 220, 230 430" fill="none" stroke="#a5d8ff" strokeWidth="16" strokeLinecap="round" opacity="0.7" />
-            <circle cx="660" cy="250" r="52" fill="#a5d8ff" opacity="0.8" />
-            <circle cx="95" cy="95" r="70" fill="#d3f9d8" opacity="0.9" />
-            <circle cx="715" cy="80" r="58" fill="#fff3bf" opacity="0.9" />
+        <div className="relative mx-5 mt-5 h-[26rem] overflow-hidden rounded-[1.25rem] border border-emerald-900/10 bg-[#e8f6ec] sm:mx-6 sm:h-[28rem]">
+          <svg viewBox="0 0 800 460" className="absolute inset-0 h-full w-full" aria-hidden="true" preserveAspectRatio="none">
+            <circle cx="712" cy="58" r="34" fill="#ffd93d" />
+            <circle cx="712" cy="58" r="52" fill="#ffd93d" opacity="0.25" />
+            <g fill="#ffffff" opacity="0.95">
+              <ellipse className="map-cloud" cx="150" cy="58" rx="58" ry="20" />
+              <ellipse className="map-cloud" cx="430" cy="38" rx="44" ry="16" />
+              <ellipse className="map-cloud" cx="610" cy="105" rx="50" ry="17" />
+            </g>
+            <path d="M-20 330 C150 275, 260 355, 410 285 S660 165, 830 215" fill="none" stroke="#74c0fc" strokeWidth="42" strokeLinecap="round" opacity="0.8" />
+            <path d="M-20 330 C150 275, 260 355, 410 285 S660 165, 830 215" fill="none" stroke="#ffffff" strokeWidth="4" strokeLinecap="round" strokeDasharray="14 18" opacity="0.8" />
+            <path d="M130 -20 C190 120, 145 245, 245 480" fill="none" stroke="#a5d8ff" strokeWidth="20" strokeLinecap="round" opacity="0.7" />
+            <ellipse cx="672" cy="272" rx="72" ry="42" fill="#a5d8ff" opacity="0.85" />
+            <g fill="#95d5a2" opacity="0.9">
+              <circle cx="88" cy="150" r="64" /><circle cx="742" cy="392" r="70" /><circle cx="88" cy="408" r="56" />
+            </g>
+            <g className="map-boat">
+              <path d="M352 292 h84 l-14 22 h-56 z" fill="#8a5a2b" />
+              <rect x="388" y="256" width="7" height="36" fill="#6f4518" />
+              <path d="M395 256 l30 28 h-30 z" fill="#ffffff" />
+              <circle cx="382" cy="282" r="9" fill="#f4a261" />
+            </g>
           </svg>
           {[
-            { name: "Maro Sebo Ulu", left: "11%", top: "16%" },
-            { name: "Batin XXIV", left: "36%", top: "8%" },
-            { name: "Bajubang", left: "76%", top: "13%" },
-            { name: "Muara Bulian", left: "43%", top: "39%" },
-            { name: "Muara Tembesi", left: "61%", top: "50%" },
-            { name: "Mersam", left: "85%", top: "40%" },
-            { name: "Maro Sebo Ilir", left: "79%", top: "66%" },
-            { name: "Pemayung", left: "52%", top: "76%" },
-          ].map((node) => (
-            <button
-              key={node.name}
-              type="button"
-              onClick={() => { setFilter(node.name); document.getElementById("daftar-cerita")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
-              aria-pressed={filter === node.name}
-              className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 px-3.5 py-2 text-xs font-bold shadow-sm transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400 sm:text-sm ${filter === node.name ? "border-emerald-800 bg-emerald-800 text-white" : "border-emerald-700/40 bg-white text-emerald-900 hover:border-emerald-700"}`}
-              style={{ left: node.left, top: node.top }}
-            >
-              {node.name}
-            </button>
-          ))}
-          <span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-emerald-800">Sungai Batanghari mengalir dari hulu ke hilir</span>
+            { name: "Maro Sebo Ulu", left: "12%", top: "20%", color: "#40916c", icon: "M3 15h18l-2.2 4.5H6L3 15Zm9-9v8m0-8 5 5h-5" },
+            { name: "Batin XXIV", left: "37%", top: "11%", color: "#2d6a4f", icon: "M12 2 18 10h-3.5L19 16H5l4.5-6H6L12 2Zm-1.2 14h2.4l.8 6h-4l.8-6Z" },
+            { name: "Bajubang", left: "77%", top: "15%", color: "#bc6c25", icon: "M4 20 14 8l6 6M14 8v12M5 20h15M14 8l4.5-3.5" },
+            { name: "Muara Bulian", left: "43%", top: "40%", color: "#065f46", icon: "M12 2 18 10h-3.5L19 16H5l4.5-6H6L12 2Zm-1.2 14h2.4l.8 6h-4l.8-6Z" },
+            { name: "Muara Tembesi", left: "61%", top: "53%", color: "#9c6644", icon: "M4 21V9h3V6h3v3h4V6h3v3h3v12h-6v-5a2 2 0 0 0-4 0v5H4Z" },
+            { name: "Mersam", left: "86%", top: "42%", color: "#bc4749", icon: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 0v4m6.5 2-3.5 2m3.5 7-3.5-2M5.5 20l3.5-2M5.5 9l3.5 2" },
+            { name: "Maro Sebo Ilir", left: "79%", top: "70%", color: "#e07a5f", icon: "M4 17c-1.2-4.5 1.8-8 5.5-7C10.7 7.8 14 6.7 16 8l3.2-1.2L17.6 9.6c1.1 1.2 1.6 2.8 1 4.4-1 2.8-4.6 4.4-8.6 3.8L4 17Z" },
+            { name: "Pemayung", left: "51%", top: "79%", color: "#7fb069", icon: "M12 22V10m0 0c0-4-3-6-7-7 0 4 3 7 7 7Zm0 0c0-4 3-6 7-7 0 4-3 7-7 7Zm0 6c0-4-3-6-7-7 0 4 3 7 7 7Zm0 0c0-4 3-6 7-7 0 4-3 7-7 7Z" },
+          ].map((node, nodeIndex) => {
+            const count = THEMES.filter((t) => THEME_KECAMATAN[t.slug] === node.name).length;
+            const active = filter === node.name;
+            return (
+              <button
+                key={node.name}
+                type="button"
+                onClick={() => { setFilter(node.name); document.getElementById("daftar-cerita")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
+                aria-pressed={active}
+                aria-label={`${node.name}, ${count} cerita`}
+                className="map-pin group absolute z-10 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center focus:outline-none"
+                style={{ left: node.left, top: node.top, animationDelay: `${nodeIndex * 0.35}s` }}
+              >
+                <span className={`relative flex h-14 w-14 items-center justify-center rounded-full border-4 border-white text-white shadow-lg sm:h-16 sm:w-16 map-pin-icon ${active ? "ring-4 ring-amber-400" : ""}`} style={{ backgroundColor: node.color }}>
+                  <svg viewBox="0 0 24 24" className="h-7 w-7 sm:h-8 sm:w-8" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={node.icon} /></svg>
+                  <span className="absolute -top-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-amber-400 font-display text-sm font-bold text-emerald-950">{count}</span>
+                </span>
+                <span className={`mt-1.5 rounded-full px-3 py-1 text-[11px] font-bold whitespace-nowrap shadow-sm sm:text-xs ${active ? "bg-emerald-800 text-white" : "bg-white/95 text-emerald-900"}`}>{node.name}</span>
+              </button>
+            );
+          })}
+          <span className="absolute bottom-3 left-3 z-10 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-emerald-800">Sungai Batanghari mengalir dari hulu ke hilir</span>
+          <span className="absolute right-3 bottom-3 z-10 hidden rounded-full bg-emerald-800 px-3 py-1.5 text-xs font-semibold text-white sm:block">Ketuk penanda untuk melihat ceritanya</span>
         </div>
+        {filter !== "Semua" && filter !== "Semua Wilayah" && (
+          <div className="px-5 py-5 sm:px-6" aria-live="polite">
+            <h3 className="font-display text-xl font-semibold text-emerald-950">Cerita dari {filter}</h3>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {THEMES.filter((t) => THEME_KECAMATAN[t.slug] === filter).map((theme) => (
+                <article key={theme.slug} className="flex items-center gap-3 rounded-2xl border border-emerald-900/10 bg-emerald-50/60 px-4 py-3">
+                  <span className="h-10 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: theme.palette.accent }} aria-hidden="true" />
+                  <span className="min-w-0 flex-1">
+                    <span className="font-display block truncate text-lg font-semibold text-emerald-950">{theme.title}</span>
+                    <span className="block truncate text-sm text-emerald-700">{theme.subtitle}</span>
+                  </span>
+                  <button type="button" disabled={!selectedId || busyTheme !== null} onClick={() => void handleStart(theme.slug)} className="shrink-0 rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 disabled:opacity-40">
+                    {busyTheme === theme.slug ? "Membuat..." : "Mulai Baca"}
+                  </button>
+                </article>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
-
       <div className="mt-8 grid items-start gap-6 lg:grid-cols-[380px_1fr]">
         <section aria-label="Profil anak" className="lux-card rounded-[1.75rem] p-5 sm:p-6 lg:sticky lg:top-6">
           <p className="text-xs font-bold tracking-wide text-amber-600">LANGKAH 1</p>
