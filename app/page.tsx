@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { THEMES } from "@/lib/content/themes";
 import { PARENT_PIN_KEY, verifyPin } from "@/lib/parent/pin";
+import { computeStreak, todayLocal, weeklyPageCount, WEEKLY_MISSION_TARGET, type ActivityMap } from "@/lib/reading/streak";
 
 // Duplicated client-side from the API kecamatan list (Task 4 contract).
 const KECAMATAN = [
@@ -73,6 +74,27 @@ export default function HomePage() {
   const [completedSlugs, setCompletedSlugs] = useState<Set<string>>(new Set());
   const [deletePin, setDeletePin] = useState("");
   const [pinSet, setPinSet] = useState(false);
+  const [activity, setActivity] = useState<ActivityMap>({});
+  const [downloadAllState, setDownloadAllState] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!selectedId) { setActivity({}); return; }
+    try { setActivity(JSON.parse(window.localStorage.getItem(`kanti.activity.${selectedId}`) ?? "{}") as ActivityMap); } catch { setActivity({}); }
+  }, [selectedId]);
+
+  async function handleDownloadAll() {
+    setDownloadAllState("Menyiapkan semua cerita...");
+    try {
+      if (!("caches" in window)) throw new Error("unsupported");
+      const res = await fetch("/api/themes");
+      const data = await res.json();
+      const urls: string[] = ["/", "/latihan", "/api/themes"];
+      for (const theme of data.themes as { artUrls: string[] }[]) urls.push(...theme.artUrls);
+      const cache = await caches.open("kanti-stories-v3");
+      await cache.addAll(urls);
+      setDownloadAllState(`Semua ${data.themes.length} cerita tersimpan untuk dibuka tanpa internet.`);
+    } catch { setDownloadAllState("Belum bisa mengunduh semua cerita di peramban ini."); }
+  }
 
   useEffect(() => { setPinSet(Boolean(window.localStorage.getItem(PARENT_PIN_KEY))); }, []);
 
@@ -208,7 +230,10 @@ export default function HomePage() {
             <span className="text-xs font-semibold tracking-wide text-amber-600">BATANG HARI</span>
           </span>
         </span>
-        <Link href="/ringkasan" className="rounded-full border-2 border-emerald-800 px-4 py-2 text-sm font-semibold text-emerald-800 transition-colors hover:bg-emerald-800 hover:text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400">Ringkasan Bacaan</Link>
+        <span className="flex gap-2">
+          <Link href="/latihan" className="rounded-full border-2 border-amber-500 px-4 py-2 text-sm font-semibold text-amber-700 transition-colors hover:bg-amber-500 hover:text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-500">Latihan Kata</Link>
+          <Link href="/ringkasan" className="rounded-full border-2 border-emerald-800 px-4 py-2 text-sm font-semibold text-emerald-800 transition-colors hover:bg-emerald-800 hover:text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400">Ringkasan Bacaan</Link>
+        </span>
       </nav>
 
       <section className="lux-panel mt-6 rounded-[2rem] px-5 py-8 sm:px-10 sm:py-12">
@@ -228,7 +253,7 @@ export default function HomePage() {
 
       {selectedUser && (
         <div className="mt-5 flex flex-wrap items-center gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-3.5 font-medium text-emerald-950" aria-live="polite">
-          <span className="flex-1">Siap membaca sebagai <strong>{selectedUser.childName}</strong> · {selectedUser.age} tahun · {selectedUser.subdistrict} · Level {selectedUser.readingLevel}. Sekarang pilih ceritanya di bawah.</span>
+          <span className="flex-1">Siap membaca sebagai <strong>{selectedUser.childName}</strong> · {selectedUser.age} tahun · {selectedUser.subdistrict} · Level {selectedUser.readingLevel}. Sekarang pilih ceritanya di bawah. Misi minggu ini: {Math.min(weeklyPageCount(activity, todayLocal()), WEEKLY_MISSION_TARGET)} dari {WEEKLY_MISSION_TARGET} halaman · {computeStreak(Object.keys(activity), todayLocal())} hari beruntun.</span>
           {lastStory && (
             <button type="button" onClick={() => router.push(`/baca/${lastStory.storyId}`)} className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400">
               Lanjutkan: {lastStory.title} (Halaman {lastStory.pageNumber})
@@ -350,6 +375,10 @@ export default function HomePage() {
             <p className="text-sm font-medium text-emerald-700">{visibleThemes.length} cerita · masing-masing 6 halaman</p>
           </div>
           {!selectedId && <p className="mt-3 rounded-xl bg-amber-100 px-4 py-2.5 text-sm font-medium text-amber-900">Buat atau pilih profil anak dulu di Langkah 1 agar tombol Mulai Baca aktif.</p>}
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <button type="button" onClick={() => void handleDownloadAll()} className="rounded-full bg-emerald-700 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-emerald-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400">Unduh Semua Cerita</button>
+            {downloadAllState && <span className="text-sm font-medium text-emerald-800" aria-live="polite">{downloadAllState}</span>}
+          </div>
 
           <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="Saring cerita per kecamatan">
             {FILTERS.map((name) => (

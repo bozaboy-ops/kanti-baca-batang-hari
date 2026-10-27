@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Recorder from "./Recorder";
 import { highlightWords } from "@/lib/reading/highlight";
-import { TEXT_SIZE_CLASSES, clampTextSizeIndex, speakIndonesian, stopSpeaking } from "@/lib/reading/speech";
+import { TEXT_SIZE_CLASSES, clampTextSizeIndex, speakIndonesian, stopSpeaking, cleanTextForSpeech } from "@/lib/reading/speech";
+import { recordActivity, todayLocal, type ActivityMap } from "@/lib/reading/streak";
 
 interface StoryData {
   id: string;
@@ -53,13 +54,15 @@ export default function StoryBook({ storyId }: { storyId: string }) {
   const [completing, setCompleting] = useState(false);
   const [downloadState, setDownloadState] = useState<string | null>(null);
   const [textSize, setTextSize] = useState(1);
+  const [karaokeIndex, setKaraokeIndex] = useState(-1);
+  const karaokeTimer = useRef<number | null>(null);
 
   useEffect(() => {
     const saved = Number(window.localStorage.getItem("kanti.textSize"));
     if (window.localStorage.getItem("kanti.textSize") !== null) setTextSize(clampTextSizeIndex(saved));
   }, []);
 
-  useEffect(() => { stopSpeaking(); }, [pageIndex]);
+  useEffect(() => { stopSpeaking(); if (karaokeTimer.current !== null) { window.clearInterval(karaokeTimer.current); karaokeTimer.current = null; } setKaraokeIndex(-1); }, [pageIndex]);
 
   useEffect(() => {
     if (!story) return;
@@ -130,6 +133,47 @@ export default function StoryBook({ storyId }: { storyId: string }) {
     }
   }
 
+  function stopKaraoke() {
+    stopSpeaking();
+    if (karaokeTimer.current !== null) { window.clearInterval(karaokeTimer.current); karaokeTimer.current = null; }
+    setKaraokeIndex(-1);
+  }
+
+  function handleKaraoke() {
+    if (!page) return;
+    if (karaokeIndex >= 0) { stopKaraoke(); return; }
+    const words = page.storyText.split(/\s+/).filter(Boolean);
+    if (words.length === 0 || typeof window === "undefined" || !("speechSynthesis" in window)) {
+      setActionError("Baca Bersama belum tersedia di peramban ini.");
+      return;
+    }
+    stopSpeaking();
+    setKaraokeIndex(0);
+    // Fallback timer advances the highlight in case boundary events never fire.
+    karaokeTimer.current = window.setInterval(() => {
+      setKaraokeIndex((idx) => {
+        if (idx + 1 >= words.length) {
+          if (karaokeTimer.current !== null) { window.clearInterval(karaokeTimer.current); karaokeTimer.current = null; }
+          return -1;
+        }
+        return idx + 1;
+      });
+    }, 480);
+    const utterance = new SpeechSynthesisUtterance(cleanTextForSpeech(page.storyText));
+    utterance.lang = "id-ID";
+    utterance.rate = 0.85;
+    utterance.onboundary = (event) => {
+      if (typeof event.charIndex !== "number") return;
+      const spoken = cleanTextForSpeech(page.storyText).slice(0, event.charIndex).trim();
+      const index = spoken ? spoken.split(/\s+/).filter(Boolean).length : 0;
+      if (karaokeTimer.current !== null) { window.clearInterval(karaokeTimer.current); karaokeTimer.current = null; }
+      setKaraokeIndex(Math.min(index, words.length - 1));
+    };
+    utterance.onend = () => stopKaraoke();
+    utterance.onerror = () => stopKaraoke();
+    window.speechSynthesis.speak(utterance);
+  }
+
   async function handleEvaluate() {
     if (!page) return;
     setActionError(null);
@@ -144,6 +188,13 @@ export default function StoryBook({ storyId }: { storyId: string }) {
       if (!res.ok) throw new Error(data?.error ?? "Bacaan belum bisa diperiksa");
       setEvaluation(data.reading_evaluation as Evaluation);
       if (typeof data.provider === "string") setProvider(data.provider);
+      if (story) {
+        try {
+          const key = `kanti.activity.${story.userId}`;
+          const current = JSON.parse(window.localStorage.getItem(key) ?? "{}") as ActivityMap;
+          window.localStorage.setItem(key, JSON.stringify(recordActivity(current, todayLocal())));
+        } catch { /* activity is a bonus, never block reading */ }
+      }
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Bacaan belum bisa diperiksa");
     } finally {
@@ -242,8 +293,8 @@ export default function StoryBook({ storyId }: { storyId: string }) {
         )}
         <div className="p-5 sm:p-7">
           <div className="mb-4 flex flex-wrap items-center gap-2">
-            <button type="button" onClick={() => { if (!speakIndonesian(page.storyText)) setActionError("Suara bacaan belum tersedia di peramban ini. Minta bantuan orang tua membaca dulu, ya."); }} className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400">
-              Dengarkan Halaman Ini
+            <button type="button" onClick={handleKaraoke} className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400">
+              {karaokeIndex >= 0 ? "Berhenti Baca Bersama" : "Dengarkan Halaman Ini"}
             </button>
             <span className="ml-auto flex items-center gap-1" role="group" aria-label="Ukuran huruf">
               <span className="mr-1 text-xs font-bold text-emerald-700">UKURAN HURUF</span>
@@ -255,7 +306,7 @@ export default function StoryBook({ storyId }: { storyId: string }) {
           <p className={`font-display font-medium text-emerald-950 ${TEXT_SIZE_CLASSES[textSize]}`}>
             {highlighted.map((item, i) => (
               <span key={`${i}-${item.word}`}>
-                <button type="button" onClick={() => speakIndonesian(item.word)} title={`Dengarkan kata: ${item.word}`} aria-label={`Dengarkan kata ${item.word}`} className={`rounded-md px-0.5 -mx-0.5 hover:bg-amber-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${item.correct ? "font-semibold text-emerald-600" : ""}`}>
+                <button type="button" onClick={() => speakIndonesian(item.word)} title={`Dengarkan kata: ${item.word}`} aria-label={`Dengarkan kata ${item.word}`} className={`rounded-md px-0.5 -mx-0.5 hover:bg-amber-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${i === karaokeIndex ? "bg-amber-300 font-bold text-emerald-950" : item.correct ? "font-semibold text-emerald-600" : ""}`}>
                   {item.word}
                 </button>{i < highlighted.length - 1 ? " " : ""}
               </span>
@@ -346,6 +397,7 @@ export default function StoryBook({ storyId }: { storyId: string }) {
             {completion.badge && <p className="mt-3 inline-block rounded-full bg-amber-400 px-4 py-1.5 font-display font-semibold text-emerald-950">Lencana: {completion.badge}</p>}
             <div className="mt-4">
               <Link href="/ringkasan" className="inline-block rounded-full bg-white px-5 py-2.5 font-semibold text-emerald-800 hover:bg-amber-300 hover:text-emerald-950">Lihat Bintang & Lencanaku</Link>
+              <Link href={`/sertifikat/${storyId}`} className="ml-2 inline-block rounded-full bg-amber-400 px-5 py-2.5 font-semibold text-emerald-950 hover:bg-amber-300">Lihat Sertifikat</Link>
             </div>
           </div>
         )}

@@ -34,6 +34,17 @@ export async function GET() {
         .filter((c) => c.count >= 2)
         .sort((a, b) => b.count - a.count || a.word.localeCompare(b.word));
 
+      const deckMap = new Map<string, { word: string; syllables: string; gentleTip: string; count: number }>();
+      for (const p of userPages) {
+        for (const tw of normalizeStoredTrickyWords(p.trickyWords)) {
+          const key = tw.word.toLowerCase();
+          const existing = deckMap.get(key);
+          if (existing) existing.count += 1;
+          else deckMap.set(key, { word: tw.word, syllables: tw.syllables, gentleTip: tw.gentle_tip, count: 1 });
+        }
+      }
+      const trickyWordDeck = [...deckMap.values()].sort((a, b) => b.count - a.count || a.word.localeCompare(b.word)).slice(0, 30);
+
       const recentPages = [...userPages]
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         .slice(0, 10)
@@ -47,7 +58,7 @@ export async function GET() {
       const completedStories = userStories.filter((story) => story.completedAt);
       const totalStars = completedStories.reduce((sum, story) => sum + (story.stars ?? 0), 0);
       const badges = computeBadges(completedStories.map((story) => story.themeSlug));
-      return { user, storyCount: userStories.length, completedCount: completedStories.length, totalStars, badges, averageScore, frequentTrickyWords, recentPages };
+      return { user, storyCount: userStories.length, completedCount: completedStories.length, totalStars, badges, averageScore, frequentTrickyWords, trickyWordDeck, recentPages };
     });
 
     return NextResponse.json({ users: result });
