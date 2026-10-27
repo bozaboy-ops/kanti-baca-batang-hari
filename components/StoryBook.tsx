@@ -151,7 +151,7 @@ export default function StoryBook({ storyId }: { storyId: string }) {
     <main className="mx-auto w-full max-w-3xl px-4 py-6 sm:py-10">
       <header className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-bold tracking-wide text-amber-600 uppercase">BaccaAI</p>
+          <p className="text-sm font-bold tracking-wide text-amber-600 uppercase">Kanti Baca</p>
           <h1 className="font-display text-3xl font-semibold text-emerald-950">{story.title}</h1>
           <p className="text-sm text-emerald-700">Halaman {page.pageNumber} dari {pages.length}</p>
         </div>
@@ -160,11 +160,26 @@ export default function StoryBook({ storyId }: { storyId: string }) {
         </button>
       </header>
 
+      <div className="mb-5" aria-label={`Kemajuan membaca halaman ${page.pageNumber} dari ${pages.length}`}>
+        <div className="flex items-center justify-between text-xs font-bold text-emerald-700">
+          <span>HALAMAN {page.pageNumber} DARI {pages.length}</span>
+          <span>{Math.round(((pageIndex + 1) / Math.max(pages.length, 1)) * 100)}%</span>
+        </div>
+        <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-emerald-100">
+          <div className="gold-rule h-full rounded-full transition-[width] duration-500 motion-reduce:transition-none" style={{ width: `${((pageIndex + 1) / Math.max(pages.length, 1)) * 100}%` }} />
+        </div>
+        <div className="mt-2.5 flex flex-wrap gap-1.5" aria-hidden="true">
+          {pages.map((p, i) => (
+            <span key={p.id} className={`h-2 w-2 rounded-full ${i === pageIndex ? "bg-amber-500" : i < pageIndex ? "bg-emerald-600" : "bg-emerald-200"}`} />
+          ))}
+        </div>
+      </div>
+
       {provider === "local-fallback" && (
         <p className="mb-4 rounded-xl bg-amber-100 px-4 py-2 text-sm font-medium text-amber-900">Mode demo lokal: cerita dan gambar dibuat tanpa layanan AI eksternal.</p>
       )}
 
-      <section aria-label="Ilustrasi dan cerita" className="overflow-hidden rounded-3xl border-2 border-emerald-100 bg-white shadow-sm">
+      <section aria-label="Ilustrasi dan cerita" className="lux-card overflow-hidden rounded-[2rem]">
         {page.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -192,7 +207,7 @@ export default function StoryBook({ storyId }: { storyId: string }) {
         </div>
       </section>
 
-      <section aria-label="Rekam bacaan" className="mt-5 rounded-[1.75rem] border-2 border-emerald-100 bg-white p-5 shadow-sm sm:p-6">
+      <section aria-label="Rekam bacaan" className="lux-card mt-5 rounded-[1.75rem] p-5 sm:p-6">
         <h2 className="font-display mb-4 text-xl font-semibold text-emerald-950">Baca dengan Suara</h2>
         <Recorder value={transcript} onChange={setTranscript} />
         {transcript.trim() && (
@@ -223,7 +238,7 @@ export default function StoryBook({ storyId }: { storyId: string }) {
         )}
       </section>
 
-      <section aria-label="Imajinasi" className="mt-5 rounded-lg border-2 border-emerald-100 bg-white p-5 shadow-sm sm:p-6">
+      <section aria-label="Imajinasi" className="lux-card mt-5 rounded-[1.75rem] p-5 sm:p-6">
         <h2 className="font-display text-xl font-semibold text-emerald-950">Giliran Imajinasimu</h2>
         {page.interactiveQuestion && <p className="mt-2 text-lg text-emerald-900">{page.interactiveQuestion}</p>}
         <label className="mt-4 block text-sm font-semibold text-emerald-900">

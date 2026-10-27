@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "BaccaAI - Kanti Baca Batang Hari",
-    short_name: "BaccaAI",
+    name: "Kanti Baca Batang Hari",
+    short_name: "Kanti Baca",
     description: "Tutor membaca dan cerita interaktif anak berbasis kearifan lokal Kabupaten Batang Hari.",
     start_url: "/",
     display: "standalone",

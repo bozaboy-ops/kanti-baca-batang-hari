@@ -16,7 +16,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "BaccaAI - Kanti Baca Batang Hari",
+  title: "Kanti Baca Batang Hari - Tutor Membaca Anak Batang Hari",
   description: "Latihan membaca cerita lokal Batang Hari untuk anak usia 6-10 tahun.",
   manifest: "/manifest.webmanifest",
   icons: { icon: "/icon.svg" },

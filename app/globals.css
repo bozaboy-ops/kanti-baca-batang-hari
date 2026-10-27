@@ -3,8 +3,12 @@
 @theme {
   --color-primary: #10B981;
   --color-primary-dark: #065F46;
+  --color-forest: #04382B;
+  --color-forest-deep: #032A20;
   --color-surface: #FFFFFF;
   --color-accent: #F59E0B;
+  --color-gold: #C9A227;
+  --color-gold-soft: #F3D27A;
 }
 
 @theme inline {
@@ -14,6 +18,41 @@
 
 body {
   background-color: #FFFFFF;
-  color: #065F46;
+  color: #123B2F;
   font-family: var(--font-plus-jakarta-sans), system-ui, sans-serif;
+}
+
+@layer components {
+  .lux-panel {
+    background: #04382B;
+    color: #FFFFFF;
+    box-shadow: 0 24px 48px -24px rgb(3 42 32 / 0.55);
+  }
+  .lux-card {
+    background: #FFFFFF;
+    border: 1px solid rgb(6 95 70 / 0.14);
+    box-shadow: 0 14px 34px -22px rgb(3 42 32 / 0.35);
+  }
+  .gold-rule {
+    background: linear-gradient(90deg, #C9A227, #F3D27A);
+  }
+  .chip-filter {
+    border: 1.5px solid rgb(6 95 70 / 0.25);
+    color: #065F46;
+    background: #FFFFFF;
+    transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease;
+  }
+  .chip-filter:hover {
+    border-color: #065F46;
+  }
+  .chip-filter[data-active="true"] {
+    background: #065F46;
+    border-color: #065F46;
+    color: #FFFFFF;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .chip-filter {
+      transition: none;
+    }
+  }
 }

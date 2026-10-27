@@ -40,13 +40,14 @@ export default function RingkasanPage() {
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:py-12">
-      <header className="flex flex-wrap items-start justify-between gap-4">
+      <header className="lux-panel flex flex-wrap items-start justify-between gap-4 rounded-[2rem] px-6 py-8 sm:px-8">
         <div>
-          <p className="text-sm font-bold tracking-wide text-amber-600 uppercase">BaccaAI</p>
-          <h1 className="font-display text-4xl font-semibold text-emerald-950">Ringkasan Bacaan</h1>
-          <p className="mt-2 text-lg text-emerald-800">Lihat kemajuan membaca setiap anak di sini.</p>
+          <span className="gold-rule block h-1 w-14 rounded-full" aria-hidden="true" />
+          <p className="mt-4 text-sm font-bold tracking-wide text-amber-300 uppercase">Kanti Baca</p>
+          <h1 className="font-display mt-1 text-4xl font-semibold">Ringkasan Bacaan</h1>
+          <p className="mt-2 max-w-xl text-lg text-emerald-50">Lihat kemajuan membaca setiap anak di sini: cerita yang dibaca, skor, dan kata yang masih sering sulit.</p>
         </div>
-        <Link href="/" className="rounded-full bg-emerald-600 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-emerald-700 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400">Kembali ke Beranda</Link>
+        <Link href="/" className="rounded-full bg-white px-5 py-2.5 font-semibold text-emerald-800 transition-colors hover:bg-amber-300 hover:text-emerald-950 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400">Kembali ke Beranda</Link>
       </header>
 
       {loading && <p className="mt-8 text-emerald-800">Memuat ringkasan...</p>}
@@ -68,7 +69,7 @@ export default function RingkasanPage() {
 
       <div className="mt-8 space-y-6">
         {users.map((entry, idx) => (
-          <section key={entry.user.id} aria-label={`Ringkasan ${entry.user.childName}`} className={`${idx % 2 === 0 ? "rounded-3xl" : "rounded-[1.75rem]"} border-2 border-emerald-100 bg-white p-5 shadow-sm sm:p-6`}>
+          <section key={entry.user.id} aria-label={`Ringkasan ${entry.user.childName}`} className={`lux-card ${idx % 2 === 0 ? "rounded-[1.75rem]" : "rounded-[2rem]"} p-5 sm:p-6`}>
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h2 className="font-display text-2xl font-semibold text-emerald-950">{entry.user.childName}</h2>
