@@ -1,0 +1,32 @@
+{
+  "name": "bacca-ai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest run",
+    "db:init": "powershell -ExecutionPolicy Bypass -File scripts/db-init.ps1",
+    "db:start": "powershell -ExecutionPolicy Bypass -File scripts/db-start.ps1",
+    "db:stop": "powershell -ExecutionPolicy Bypass -File scripts/db-stop.ps1",
+    "db:migrate": "node scripts/migrate.mjs"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.4",
+    "next": "^16.4.3",
+    "pg": "^8.23.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.6.5",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}
