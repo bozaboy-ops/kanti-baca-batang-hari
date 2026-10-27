@@ -393,7 +393,7 @@ export default function HomePage() {
       </div>
 
       <footer className="mt-12 border-t border-emerald-900/10 pt-6 pb-2 text-center text-sm text-emerald-700">
-        Kanti Baca Batang Hari - cerita lokal Bumi Serentak Bak Regam untuk anak usia 6-10 tahun.
+        Kanti Baca Batang Hari - cerita lokal Bumi Serentak Bak Regam untuk anak usia 6-10 tahun. Boza.
       </footer>
     </main>
   );
