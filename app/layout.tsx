@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fredoka, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import RegisterSW from "../components/RegisterSW";
 
 const fredoka = Fredoka({
   subsets: ["latin"],
@@ -17,6 +18,8 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "BaccaAI - Kanti Baca Batang Hari",
   description: "Latihan membaca cerita lokal Batang Hari untuk anak usia 6-10 tahun.",
+  manifest: "/manifest.webmanifest",
+  icons: { icon: "/icon.svg" },
 };
 
 export default function RootLayout({
@@ -24,7 +27,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="id" className={`${fredoka.variable} ${plusJakartaSans.variable}`}>
-      <body>{children}</body>
+      <body>{children}<RegisterSW /></body>
     </html>
   );
 }
