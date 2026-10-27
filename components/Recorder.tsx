@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { attachRecognitionEndHandlers } from "../lib/recorder/recognitionLifecycle";
 
 interface SpeechRecognitionResultLike {
   isFinal: boolean;
@@ -106,8 +107,10 @@ export default function Recorder({ value, onChange, compact = false, textareaLab
           }
           onChangeRef.current(text.trimStart());
         };
-        recognition.onerror = () => setError("Suara belum tertangkap. Coba lagi atau ketik manual, ya.");
-        recognition.onend = () => { recognitionRef.current = null; };
+        attachRecognitionEndHandlers(recognition, {
+          onError: () => setError("Suara belum tertangkap. Coba lagi atau ketik manual, ya."),
+          stopAll,
+        });
         recognitionRef.current = recognition;
         recognition.start();
       } catch {
