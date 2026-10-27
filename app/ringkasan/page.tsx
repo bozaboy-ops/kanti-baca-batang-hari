@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 
 interface SummaryUser {
@@ -21,20 +21,22 @@ export default function RingkasanPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch("/api/summary");
-        const data = await res.json().catch(() => null);
-        if (!res.ok) throw new Error(data?.error ?? "Ringkasan belum bisa dimuat");
-        setUsers(Array.isArray(data.users) ? data.users : []);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Ringkasan belum bisa dimuat");
-      } finally {
-        setLoading(false);
-      }
-    })();
+  const loadSummary = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/summary");
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error ?? "Ringkasan belum bisa dimuat");
+      setUsers(Array.isArray(data.users) ? data.users : []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Ringkasan belum bisa dimuat");
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => { void loadSummary(); }, [loadSummary]);
 
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:py-12">
@@ -48,7 +50,12 @@ export default function RingkasanPage() {
       </header>
 
       {loading && <p className="mt-8 text-emerald-800">Memuat ringkasan...</p>}
-      {error && <p role="alert" className="mt-8 rounded-xl bg-amber-100 px-4 py-3 font-medium text-amber-900">{error}</p>}
+      {error && (
+        <div role="alert" className="mt-8 flex flex-wrap items-center gap-3 rounded-xl bg-amber-100 px-4 py-3 font-medium text-amber-900">
+          <span className="flex-1">{error}</span>
+          <button type="button" onClick={() => void loadSummary()} className="rounded-full bg-amber-500 px-4 py-1.5 text-sm font-semibold text-white hover:bg-amber-600">Coba Lagi</button>
+        </div>
+      )}
 
       {!loading && !error && users.length === 0 && (
         <section className="mt-8 rounded-3xl border-2 border-emerald-100 bg-white p-8 text-center shadow-sm">

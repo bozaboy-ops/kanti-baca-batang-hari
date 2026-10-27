@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS story_pages (
 
 CREATE INDEX IF NOT EXISTS idx_stories_user_id ON stories(user_id);
 CREATE INDEX IF NOT EXISTS idx_story_pages_story_id ON story_pages(story_id);
+CREATE UNIQUE INDEX IF NOT EXISTS story_pages_story_id_page_number_unique ON story_pages(story_id, page_number);
 `;
 
 const client = new pg.Client({ connectionString });

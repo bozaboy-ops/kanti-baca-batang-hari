@@ -69,3 +69,15 @@ describe("database schema (migration SQL text)", () => {
     expect(schema).toContain("tricky_words");
   });
 });
+
+describe("story_pages page uniqueness", () => {
+  it("migration creates a unique index on (story_id, page_number)", () => {
+    const sql = migrationSql().toLowerCase();
+    expect(sql).toMatch(/create unique index if not exists \w+ on story_pages\(story_id, page_number\)/);
+  });
+  it("Drizzle schema declares the same unique index", () => {
+    const schema = readFileSync(join(root, "lib", "db", "schema.ts"), "utf8").toLowerCase();
+    expect(schema).toContain("uniqueindex");
+    expect(schema).toContain("story_pages_story_id_page_number_unique");
+  });
+});

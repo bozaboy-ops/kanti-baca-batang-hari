@@ -119,7 +119,11 @@ export default function StoryBook({ storyId }: { storyId: string }) {
       const nextNumber = data.next_story_segment?.page_number as number | undefined;
       const fresh = await loadStory();
       const target = fresh && nextNumber ? fresh.pages.findIndex((p) => p.pageNumber === nextNumber) : -1;
-      if (target >= 0) setPageIndex(target);
+      if (target >= 0) {
+        setPageIndex(target);
+      } else {
+        setActionError("Halaman barumu sudah dibuat, tapi belum bisa dibuka. Tekan Buat Halaman Baru sekali lagi atau muat ulang halaman ini, ya.");
+      }
     } catch (err) {
       setActionError(err instanceof Error ? err.message : "Halaman baru belum bisa dibuat");
     } finally {
@@ -134,7 +138,10 @@ export default function StoryBook({ storyId }: { storyId: string }) {
     return (
       <main className="mx-auto w-full max-w-3xl px-4 py-10 text-center">
         <p role="alert" className="rounded-2xl bg-amber-100 px-4 py-3 font-medium text-amber-900">{loadError ?? "Cerita tidak ditemukan"}</p>
-        <Link href="/" className="mt-4 inline-block rounded-full bg-emerald-600 px-5 py-2.5 font-semibold text-white hover:bg-emerald-700">Kembali ke Beranda</Link>
+        <div className="mt-4 flex flex-wrap justify-center gap-3">
+          <button type="button" onClick={() => { setLoading(true); setLoadError(null); void loadStory(); }} className="rounded-full bg-amber-500 px-5 py-2.5 font-semibold text-white hover:bg-amber-600">Coba Lagi</button>
+          <Link href="/" className="inline-block rounded-full bg-emerald-600 px-5 py-2.5 font-semibold text-white hover:bg-emerald-700">Kembali ke Beranda</Link>
+        </div>
       </main>
     );
   }

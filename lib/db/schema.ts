@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, integer, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, integer, timestamp, jsonb, uniqueIndex } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -35,4 +35,6 @@ export const storyPages = pgTable("story_pages", {
   interactiveQuestion: text("interactive_question"),
   museImagePrompt: text("muse_image_prompt"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+}, (t) => [
+  uniqueIndex("story_pages_story_id_page_number_unique").on(t.storyId, t.pageNumber),
+]);

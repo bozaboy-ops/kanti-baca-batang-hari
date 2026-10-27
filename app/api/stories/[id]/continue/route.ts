@@ -58,6 +58,34 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         };
 
   const nextNumber = result.next_story_segment.page_number;
+  // Idempotent continue: a double-submit or retry for the same page returns
+  // the page already created instead of inserting a duplicate (the unique
+  // index on (story_id, page_number) is the backstop).
+  try {
+    const existing = await db
+      .select()
+      .from(storyPages)
+      .where(and(eq(storyPages.storyId, story.id), eq(storyPages.pageNumber, nextNumber)))
+      .limit(1);
+    if (existing.length > 0) {
+      await db
+        .update(storyPages)
+        .set({ childImaginationInput: v.value.imagination })
+        .where(eq(storyPages.id, page.id));
+      return NextResponse.json({
+        reading_evaluation,
+        next_story_segment: {
+          page_number: existing[0].pageNumber,
+          story_text: existing[0].storyText,
+          interactive_question: existing[0].interactiveQuestion ?? "",
+        },
+        muse_image_prompt: existing[0].museImagePrompt ?? result.muse_image_prompt,
+        provider: "local-fallback",
+      });
+    }
+  } catch {
+    return dbUnavailable();
+  }
   const imageUrl = imageUrlFor(story.id, nextNumber);
   try {
     await writeIllustration(story.id, nextNumber, generateIllustrationSvg(story.themeSlug, v.value.imagination));
@@ -79,6 +107,25 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       imageUrl,
     });
   } catch {
+    try {
+      const winner = await db
+        .select()
+        .from(storyPages)
+        .where(and(eq(storyPages.storyId, story.id), eq(storyPages.pageNumber, nextNumber)))
+        .limit(1);
+      if (winner.length > 0) {
+        return NextResponse.json({
+          reading_evaluation,
+          next_story_segment: {
+            page_number: winner[0].pageNumber,
+            story_text: winner[0].storyText,
+            interactive_question: winner[0].interactiveQuestion ?? "",
+          },
+          muse_image_prompt: winner[0].museImagePrompt ?? result.muse_image_prompt,
+          provider: "local-fallback",
+        });
+      }
+    } catch { /* fall through to 503 */ }
     return dbUnavailable();
   }
   return NextResponse.json({

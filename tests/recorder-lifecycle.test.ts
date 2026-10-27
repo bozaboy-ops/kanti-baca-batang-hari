@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { attachRecognitionEndHandlers } from "../lib/recorder/recognitionLifecycle";
+import { attachRecognitionEndHandlers, mergeTranscriptSegments, tryStartRecognition } from "../lib/recorder/recognitionLifecycle";
 
 function fakeRecognition() {
   return {
@@ -31,5 +31,27 @@ describe("attachRecognitionEndHandlers", () => {
 
     expect(onError).not.toHaveBeenCalled();
     expect(stopAll).toHaveBeenCalledTimes(1);
+  });
+});
+describe("mergeTranscriptSegments", () => {
+  it("joins recognition segments with a single space", () => {
+    expect(mergeTranscriptSegments(["Alif berdiri", "di tepi sungai"])).toBe("Alif berdiri di tepi sungai");
+  });
+  it("drops empty segments and collapses whitespace", () => {
+    expect(mergeTranscriptSegments(["  halo ", "", "  dunia  "])).toBe("halo dunia");
+  });
+});
+
+describe("tryStartRecognition", () => {
+  it("returns true when start succeeds", () => {
+    const onError = vi.fn();
+    expect(tryStartRecognition({ start: () => undefined }, onError)).toBe(true);
+    expect(onError).not.toHaveBeenCalled();
+  });
+  it("returns false and reports when start throws", () => {
+    const onError = vi.fn();
+    const bad = { start: () => { throw new Error("not allowed"); } };
+    expect(tryStartRecognition(bad, onError)).toBe(false);
+    expect(onError).toHaveBeenCalledTimes(1);
   });
 });

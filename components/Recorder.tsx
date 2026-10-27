@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { attachRecognitionEndHandlers } from "../lib/recorder/recognitionLifecycle";
+import { attachRecognitionEndHandlers, mergeTranscriptSegments, tryStartRecognition } from "../lib/recorder/recognitionLifecycle";
 
 interface SpeechRecognitionResultLike {
   isFinal: boolean;
@@ -101,20 +101,27 @@ export default function Recorder({ value, onChange, compact = false, textareaLab
         recognition.continuous = true;
         recognition.interimResults = true;
         recognition.onresult = (event) => {
-          let text = "";
+          const segments: string[] = [];
           for (let i = 0; i < event.results.length; i++) {
-            text += event.results[i][0].transcript;
+            segments.push(event.results[i][0].transcript);
           }
-          onChangeRef.current(text.trimStart());
+          onChangeRef.current(mergeTranscriptSegments(segments));
         };
         attachRecognitionEndHandlers(recognition, {
           onError: () => setError("Suara belum tertangkap. Coba lagi atau ketik manual, ya."),
           stopAll,
         });
         recognitionRef.current = recognition;
-        recognition.start();
+        const started = tryStartRecognition(recognition, () =>
+          setError("Rekaman suara belum bisa dimulai. Ketik manual saja, ya."),
+        );
+        if (!started) {
+          recognitionRef.current = null;
+          return;
+        }
       } catch {
         setError("Rekaman suara belum bisa dimulai. Ketik manual saja, ya.");
+        return;
       }
     }
     // MediaRecorder is only a recording indicator/timer; audio is discarded.

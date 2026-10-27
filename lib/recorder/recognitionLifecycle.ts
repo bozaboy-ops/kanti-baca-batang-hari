@@ -27,3 +27,28 @@ export function attachRecognitionEndHandlers(
     handlers.stopAll();
   };
 }
+/** Segments arrive per result; joining without a space merges words
+ *  ("berdiri" + "di tepi" -> "berdiridi") and fabricates tricky words. */
+export function mergeTranscriptSegments(segments: string[]): string {
+  return segments
+    .map((segment) => segment.trim())
+    .filter((segment) => segment.length > 0)
+    .join(" ")
+    .replace(/\s+/g, " ");
+}
+
+export interface StartableRecognition {
+  start: () => void;
+}
+
+/** start() can throw (mic denied at OS level). Callers must only enter the
+ *  recording state when this returns true. */
+export function tryStartRecognition(recognition: StartableRecognition, onError: () => void): boolean {
+  try {
+    recognition.start();
+    return true;
+  } catch {
+    onError();
+    return false;
+  }
+}

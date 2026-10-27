@@ -48,6 +48,8 @@ export default function HomePage() {
   const [busyTheme, setBusyTheme] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [loadingUsers, setLoadingUsers] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   const loadUsers = useCallback(async () => {
     try {
@@ -55,7 +57,9 @@ export default function HomePage() {
       const data = await res.json().catch(() => null);
       if (!res.ok) throw new Error(data?.error ?? "Profil belum bisa dimuat");
       setUsers(Array.isArray(data.users) ? data.users : []);
+      setLoadFailed(false);
     } catch (err) {
+      setLoadFailed(true);
       setError(err instanceof Error ? err.message : "Profil belum bisa dimuat");
     } finally {
       setLoadingUsers(false);
@@ -66,6 +70,14 @@ export default function HomePage() {
     setSelectedId(window.localStorage.getItem(STORAGE_KEY));
     void loadUsers();
   }, [loadUsers]);
+
+  useEffect(() => {
+    if (loadingUsers || !selectedId) return;
+    if (!users.some((u) => u.id === selectedId)) {
+      setSelectedId(null);
+      window.localStorage.removeItem(STORAGE_KEY);
+    }
+  }, [users, loadingUsers, selectedId]);
 
   function selectUser(id: string) {
     setSelectedId(id);
@@ -100,6 +112,7 @@ export default function HomePage() {
       const res = await fetch(`/api/users/${id}`, { method: "DELETE" });
       const data = await res.json().catch(() => null);
       if (!res.ok) throw new Error(data?.error ?? "Profil belum bisa dihapus");
+      setConfirmDeleteId(null);
       if (selectedId === id) {
         setSelectedId(null);
         window.localStorage.removeItem(STORAGE_KEY);
@@ -141,7 +154,12 @@ export default function HomePage() {
         <Link href="/ringkasan" className="rounded-full bg-amber-500 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-amber-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-500">Lihat Ringkasan</Link>
       </header>
 
-      {error && <p role="alert" className="mt-5 rounded-xl bg-amber-100 px-4 py-3 font-medium text-amber-900">{error}</p>}
+      {error && (
+        <div role="alert" className="mt-5 flex flex-wrap items-center gap-3 rounded-xl bg-amber-100 px-4 py-3 font-medium text-amber-900">
+          <span className="flex-1">{error}</span>
+          {loadFailed && <button type="button" onClick={() => { setError(null); setLoadingUsers(true); void loadUsers(); }} className="rounded-full bg-amber-500 px-4 py-1.5 text-sm font-semibold text-white hover:bg-amber-600">Coba Lagi</button>}
+        </div>
+      )}
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[2fr_3fr]">
         <section aria-label="Profil anak" className="rounded-3xl border-2 border-emerald-100 bg-white p-5 shadow-sm sm:p-6">
@@ -184,7 +202,14 @@ export default function HomePage() {
                       <span className="text-sm text-emerald-700">{user.age} tahun · {user.subdistrict} · {user.readingLevel}</span>
                       {selected && <span className="mt-0.5 block text-sm font-semibold text-emerald-600">Profil dipilih</span>}
                     </button>
-                    <button type="button" onClick={() => void handleDelete(user.id)} aria-label={`Hapus profil ${user.childName}`} className="shrink-0 rounded-full border-2 border-amber-500 px-3.5 py-1.5 text-sm font-semibold text-amber-700 transition-colors hover:bg-amber-50">Hapus</button>
+                    {confirmDeleteId === user.id ? (
+                      <span className="flex shrink-0 items-center gap-2">
+                        <button type="button" onClick={() => void handleDelete(user.id)} aria-label={`Konfirmasi hapus profil ${user.childName}`} className="rounded-full bg-amber-500 px-3.5 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-amber-600">Ya, Hapus {user.childName}</button>
+                        <button type="button" onClick={() => setConfirmDeleteId(null)} className="rounded-full border-2 border-emerald-600 px-3.5 py-1.5 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-50">Batal</button>
+                      </span>
+                    ) : (
+                      <button type="button" onClick={() => setConfirmDeleteId(user.id)} aria-label={`Hapus profil ${user.childName}`} className="shrink-0 rounded-full border-2 border-amber-500 px-3.5 py-1.5 text-sm font-semibold text-amber-700 transition-colors hover:bg-amber-50">Hapus</button>
+                    )}
                   </li>
                 );
               })}
