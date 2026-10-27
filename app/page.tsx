@@ -184,7 +184,7 @@ export default function HomePage() {
         <p className="mt-4 max-w-2xl text-lg leading-relaxed text-emerald-50">Cerita anak dari sungai, hutan, danau, pasar, dan sawah di Kabupaten Batang Hari. Baca dengan suara, dengarkan koreksi lembut, lalu ciptakan halaman berikutnya.</p>
         <ol className="mt-8 grid gap-3 sm:grid-cols-3">
           {STEPS.map((step, i) => (
-            <li key={step.title} className="rounded-2xl border border-white/20 bg-white/10 p-4">
+            <li key={step.title} className="h-full rounded-2xl border border-white/20 bg-white/10 p-4">
               <span className="font-display flex h-8 w-8 items-center justify-center rounded-full bg-amber-400 text-base font-bold text-emerald-950">{i + 1}</span>
               <h2 className="font-display mt-3 text-lg font-semibold">{step.title}</h2>
               <p className="mt-1 text-sm leading-relaxed text-emerald-50">{step.text}</p>
@@ -277,20 +277,21 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-5 grid auto-rows-fr gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {visibleThemes.map((theme) => (
-              <article key={theme.slug} className="lux-card flex flex-col overflow-hidden rounded-[1.5rem]">
-                <div className="px-5 pt-5" style={{ backgroundColor: theme.palette.sky }}>
-                  <span className="gold-rule block h-1 w-12 rounded-full" aria-hidden="true" />
-                  <h3 className="font-display mt-3 text-2xl leading-snug font-semibold text-emerald-950">{theme.title}</h3>
-                  <p className="min-h-12 pb-4 text-sm leading-relaxed text-emerald-800">{theme.subtitle}</p>
+              <article key={theme.slug} className="lux-card flex h-full flex-col overflow-hidden rounded-[1.5rem]">
+                <div className="flex h-52 flex-col px-5 pt-5" style={{ backgroundColor: theme.palette.sky }}>
+                  <span className="gold-rule block h-1 w-12 shrink-0 rounded-full" aria-hidden="true" />
+                  <h3 className="font-display mt-3 line-clamp-2 text-2xl leading-snug font-semibold text-emerald-950">{theme.title}</h3>
+                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-emerald-800">{theme.subtitle}</p>
                 </div>
                 <div className="flex flex-1 flex-col px-5 py-4">
-                  <p className="flex flex-wrap gap-2 text-xs font-bold text-emerald-700">
-                    <span className="rounded-full bg-emerald-50 px-3 py-1">6 HALAMAN</span>
-                    <span className="rounded-full bg-amber-50 px-3 py-1 text-amber-700">{THEME_KECAMATAN[theme.slug].toUpperCase()}</span>
+                  <p className="flex h-7 flex-nowrap items-center gap-2 overflow-hidden text-xs font-bold text-emerald-700">
+                    <span className="shrink-0 rounded-full bg-emerald-50 px-3 py-1 whitespace-nowrap">6 HALAMAN</span>
+                    <span className="truncate rounded-full bg-amber-50 px-3 py-1 whitespace-nowrap text-amber-700">{THEME_KECAMATAN[theme.slug].toUpperCase()}</span>
                   </p>
-                  <button type="button" disabled={!selectedId || busyTheme !== null} onClick={() => void handleStart(theme.slug)} className="mt-4 w-full rounded-xl bg-emerald-700 px-5 py-3 font-display text-base font-semibold text-white transition-colors hover:bg-emerald-800 disabled:opacity-40">
+                  <span className="min-h-4 flex-1" aria-hidden="true" />
+                  <button type="button" disabled={!selectedId || busyTheme !== null} onClick={() => void handleStart(theme.slug)} className="w-full rounded-xl bg-emerald-700 px-5 py-3 font-display text-base font-semibold text-white transition-colors hover:bg-emerald-800 disabled:opacity-40">
                     {busyTheme === theme.slug ? "Membuat Cerita..." : "Mulai Baca"}
                   </button>
                 </div>

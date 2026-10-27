@@ -179,7 +179,7 @@ export default function StoryBook({ storyId }: { storyId: string }) {
         <p className="mb-4 rounded-xl bg-amber-100 px-4 py-2 text-sm font-medium text-amber-900">Mode demo lokal: cerita dan gambar dibuat tanpa layanan AI eksternal.</p>
       )}
 
-      <section aria-label="Ilustrasi dan cerita" className="lux-card overflow-hidden rounded-[2rem]">
+      <section aria-label="Ilustrasi dan cerita" className="lux-card overflow-hidden rounded-[1.75rem]">
         {page.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -224,9 +224,9 @@ export default function StoryBook({ storyId }: { storyId: string }) {
               <p className="font-medium text-emerald-900">{evaluation.praise_message}</p>
             </div>
             {evaluation.tricky_words.length > 0 && (
-              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <div className="mt-4 grid auto-rows-fr gap-3 sm:grid-cols-3">
                 {evaluation.tricky_words.map((tw) => (
-                  <article key={tw.word} className="rounded-2xl border border-amber-300 bg-white p-4">
+                  <article key={tw.word} className="h-full rounded-2xl border border-amber-300 bg-white p-4">
                     <h3 className="font-display text-lg font-semibold text-emerald-950">{tw.word}</h3>
                     <p className="mt-1 font-semibold text-amber-600">{tw.syllables}</p>
                     <p className="mt-1 text-sm text-emerald-800">{tw.gentle_tip}</p>

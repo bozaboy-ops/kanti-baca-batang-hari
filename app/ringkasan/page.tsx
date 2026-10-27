@@ -69,7 +69,7 @@ export default function RingkasanPage() {
 
       <div className="mt-8 space-y-6">
         {users.map((entry, idx) => (
-          <section key={entry.user.id} aria-label={`Ringkasan ${entry.user.childName}`} className={`lux-card ${idx % 2 === 0 ? "rounded-[1.75rem]" : "rounded-[2rem]"} p-5 sm:p-6`}>
+          <section key={entry.user.id} aria-label={`Ringkasan ${entry.user.childName}`} className="lux-card rounded-[1.75rem] p-5 sm:p-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h2 className="font-display text-2xl font-semibold text-emerald-950">{entry.user.childName}</h2>
