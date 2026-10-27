@@ -51,6 +51,21 @@ function sceneShapes(slug: string, palette: { sky: string; land: string; accent:
   if (slug === "sawah-pemayung") {
     return `<g opacity="0.9"><path d="M0 360 h800 v60 h-800 z" fill="#a9d97c"/><path d="M0 420 h800 v50 h-800 z" fill="#8ec96a"/><path d="M0 470 h800 v130 h-800 z" fill="${palette.land}"/><g stroke="#588157" stroke-width="5" stroke-linecap="round"><path d="M120 500 v-38M150 500 v-44M640 505 v-38M670 505 v-44M400 510 v-40"/></g><rect x="600" y="300" width="90" height="60" fill="#b08968"/><path d="M595 300 l50 -34 50 34 z" fill="#8a5a2b"/></g>`;
   }
+  if (slug === "bajubang") {
+    return `<g opacity="0.9"><path d="M330 470 v-150 l70 -70 70 70 v150" stroke="#5f4128" stroke-width="14" fill="none"/><path d="M400 250 v220" stroke="#5f4128" stroke-width="10"/><circle cx="400" cy="470" r="26" fill="#606c38"/><rect x="120" y="360" width="16" height="110" fill="#6f4518"/><circle cx="128" cy="345" r="48" fill="${palette.land}"/><rect x="640" y="370" width="16" height="100" fill="#6f4518"/><circle cx="648" cy="355" r="42" fill="${palette.land}"/></g><rect x="0" y="470" width="800" height="130" fill="${palette.land}"/>`;
+  }
+  if (slug === "mersam") {
+    return `<g opacity="0.9"><rect x="0" y="430" width="800" height="170" fill="#74c0fc" opacity="0.65"/><rect x="180" y="240" width="22" height="200" fill="#6f4518"/><circle cx="191" cy="215" r="88" fill="${palette.land}"/><circle cx="330" cy="300" r="26" fill="#bc6c25"/><circle cx="95" cy="330" r="22" fill="#bc6c25"/><circle cx="560" cy="290" r="24" fill="#bc6c25"/><rect x="580" y="250" width="18" height="190" fill="#6f4518"/><circle cx="589" cy="230" r="64" fill="${palette.land}"/></g><rect x="0" y="490" width="800" height="110" fill="${palette.land}"/>`;
+  }
+  if (slug === "maro-sebo-ulu") {
+    return `<g opacity="0.9"><path d="M0 470 q260 -90 520 -30 l280 30 v130 h-800 z" fill="#a5d8ff" opacity="0.85"/><path d="M0 300 q180 -70 330 -20 l-40 190 h-290 z" fill="${palette.land}" opacity="0.75"/><path d="M800 290 q-180 -60 -320 -10 l40 190 h280 z" fill="${palette.land}"/><rect x="560" y="330" width="90" height="55" fill="#b08968"/><path d="M555 330 l50 -30 50 30 z" fill="#8a5a2b"/></g>`;
+  }
+  if (slug === "maro-sebo-ilir") {
+    return `<g opacity="0.9"><ellipse cx="400" cy="470" rx="370" ry="90" fill="#a5d8ff" opacity="0.8"/><g stroke="#588157" stroke-width="6" stroke-linecap="round"><path d="M110 500 v-70M140 505 v-55M660 500 v-70M690 505 v-55"/></g><circle cx="300" cy="455" r="20" fill="#f4a6b7"/><circle cx="520" cy="465" r="17" fill="#f4a6b7"/><rect x="90" y="270" width="110" height="80" fill="#dda15e"/><rect x="112" y="350" width="12" height="90" fill="#6f4518"/><rect x="166" y="350" width="12" height="90" fill="#6f4518"/><path d="M82 270 l63 -38 63 38 z" fill="#8a5a2b"/></g><rect x="0" y="520" width="800" height="80" fill="${palette.land}"/>`;
+  }
+  if (slug === "batin-xxiv") {
+    return `<g opacity="0.9"><g fill="#6f4518"><rect x="120" y="270" width="16" height="200"/><rect x="270" y="260" width="16" height="210"/><rect x="420" y="270" width="16" height="200"/><rect x="570" y="260" width="16" height="210"/><rect x="700" y="275" width="14" height="195"/></g><g fill="${palette.land}"><circle cx="128" cy="245" r="58"/><circle cx="278" cy="235" r="62"/><circle cx="428" cy="245" r="58"/><circle cx="578" cy="235" r="62"/><circle cx="707" cy="250" r="52"/></g><g fill="#ffffff"><ellipse cx="150" cy="400" rx="16" ry="11"/><ellipse cx="300" cy="410" rx="16" ry="11"/><ellipse cx="450" cy="400" rx="16" ry="11"/><ellipse cx="600" cy="410" rx="16" ry="11"/></g></g><rect x="0" y="470" width="800" height="130" fill="${palette.land}"/>`;
+  }
   // kuliner-tradisi
   return `<g><rect x="180" y="400" width="440" height="28" rx="8" fill="#8a5a2b"/><rect x="220" y="428" width="18" height="60" fill="#6f4518"/><rect x="562" y="428" width="18" height="60" fill="#6f4518"/><ellipse cx="320" cy="385" rx="65" ry="22" fill="#ffffff"/><ellipse cx="320" cy="378" rx="48" ry="14" fill="${palette.accent}"/><ellipse cx="480" cy="385" rx="65" ry="22" fill="#ffffff"/><ellipse cx="480" cy="378" rx="48" ry="14" fill="#f2cc8f"/></g><rect x="0" y="488" width="800" height="112" fill="${palette.land}"/>`;
 }

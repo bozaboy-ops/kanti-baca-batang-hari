@@ -299,8 +299,182 @@ export const THEMES: Theme[] = [
     imagePromptBase:
       "Warm watercolor children's book illustration of Alif, a young Indonesian boy, planting rice seedlings with farmers in the green rice fields of Pemayung, Batanghari region, Jambi, Indonesia, with golden rice and a small hut, soft sunlight, gentle flat shapes, no text",
   },
+  {
+    slug: "bajubang",
+    title: "Kota Minyak Bajubang",
+    subtitle: "Alif belajar tentang sumur minyak tua dan energi di Bajubang",
+    character: "Alif",
+    palette: { sky: "#fdebd3", land: "#8a7a5b", accent: "#606c38" },
+    pages: [
+      {
+        text: "Alif tiba di Bajubang bersama Ayah. Di kejauhan terlihat menara besi tua yang tinggi. Kata Ayah, Bajubang dikenal sebagai kota minyak sejak dulu.",
+        question: "Apa yang dilihat Alif setiba di Bajubang?",
+      },
+      {
+        text: "Alif melihat pompa minyak bergerak naik turun pelan. Pompa itu mengambil minyak dari dalam bumi. Alif menonton dari tempat yang aman bersama petugas.",
+        question: "Mengapa Alif harus menonton pompa minyak dari tempat yang aman?",
+      },
+      {
+        text: "Pak Petugas bercerita kepada Alif tentang pekerja Bajubang zaman dahulu. Mereka bekerja keras dengan alat sederhana. Minyak dari Bajubang menggerakkan banyak kendaraan dan mesin.",
+        question: "Apa manfaat minyak bumi bagi kehidupan kita?",
+      },
+      {
+        text: "Alif belajar bahwa minyak bisa habis bila dipakai terus. Kita harus hemat lampu dan kendaraan. Matahari dan air sungai juga bisa menjadi sumber tenaga.",
+        question: "Apa yang bisa kita lakukan untuk menghemat tenaga di rumah?",
+      },
+      {
+        text: "Di taman kecil Bajubang, Alif menanam pohon bersama anak-anak setempat. Pohon membuat udara bersih di sekitar kota minyak. Semua bekerja sambil tertawa.",
+        question: "Mengapa menanam pohon penting bagi kota Bajubang?",
+      },
+      {
+        text: "Alif pulang dari Bajubang membawa cerita tentang energi dan kerja keras. Alif ingin belajar rajin agar kelak bisa menjaga bumi. Bajubang tetap dikenang sebagai kota minyak yang bersejarah.",
+        question: "Apa cita-cita Alif setelah berkunjung ke Bajubang?",
+      },
+    ],
+    imagePromptBase:
+      "Warm watercolor children's book illustration of Alif, a young Indonesian boy, visiting the historic oil town of Bajubang in the Batanghari region, Jambi, Indonesia, with an old oil pumpjack seen safely from a distance, green park trees and soft light, gentle flat shapes, no text",
+  },
+  {
+    slug: "mersam",
+    title: "Durian Runtuh di Mersam",
+    subtitle: "Alif memanen durian dan bermain di tepi sungai Mersam",
+    character: "Alif",
+    palette: { sky: "#e8f3d8", land: "#588157", accent: "#bc6c25" },
+    pages: [
+      {
+        text: "Alif pergi ke kebun durian di Mersam bersama Paman. Pohon durian tinggi dan rindang sekali. Bau durian harum tercium dari kejauhan.",
+        question: "Apa yang tercium oleh Alif di kebun Mersam?",
+      },
+      {
+        text: "Di Mersam, durian tidak dipetik, tetapi ditunggu sampai jatuh sendiri. Alif mendengar bunyi gedebuk pelan dari kebun. Itu tanda durian sudah matang di pohon.",
+        question: "Bagaimana cara mengetahui durian sudah matang di Mersam?",
+      },
+      {
+        text: "Alif membantu Paman mengumpulkan durian yang jatuh ke jaring pengaman. Durian berduri tajam, jadi tangan harus hati-hati. Alif memakai sarung tangan tebal pemberian Paman.",
+        question: "Mengapa Alif memakai sarung tangan saat mengumpulkan durian?",
+      },
+      {
+        text: "Di tepi sungai Mersam, Alif membelah durian bersama keluarga Paman. Dagingnya kuning, lembut, dan manis sekali. Semua makan bergantian dengan gembira.",
+        question: "Bagaimana rasa durian Mersam menurut Alif?",
+      },
+      {
+        text: "Alif menyisihkan biji durian untuk ditanam kembali. Biji ditanam di tanah yang subur dekat kebun Mersam. Kelak, biji itu tumbuh menjadi pohon durian baru.",
+        question: "Mengapa biji durian perlu ditanam kembali?",
+      },
+      {
+        text: "Sore hari, Alif pulang dari Mersam membawa satu durian untuk Ibu. Sepanjang jalan, Alif bercerita tentang kebun dan sungai. Mersam selalu harum dalam kenangan Alif.",
+        question: "Untuk siapa durian yang dibawa pulang Alif dari Mersam?",
+      },
+    ],
+    imagePromptBase:
+      "Warm watercolor children's book illustration of Alif, a young Indonesian boy, in a durian orchard in Mersam, Batanghari region, Jambi, Indonesia, with tall durian trees, fallen durian fruit and a calm river nearby, soft sunlight, gentle flat shapes, no text",
+  },
+  {
+    slug: "maro-sebo-ulu",
+    title: "Perahu ke Hulu Maro Sebo Ulu",
+    subtitle: "Alif menyusuri sungai menuju kampung-kampung di hulu Batang Hari",
+    character: "Alif",
+    palette: { sky: "#d8ecf3", land: "#386641", accent: "#40916c" },
+    pages: [
+      {
+        text: "Alif naik perahu menuju Maro Sebo Ulu, ke arah hulu sungai. Air semakin jernih dan sejuk. Pepohonan hijau rapat di kedua tepi sungai.",
+        question: "Ke mana arah perjalanan perahu Alif di Maro Sebo Ulu?",
+      },
+      {
+        text: "Di tengah perjalanan ke Maro Sebo Ulu, Alif melihat burung-burung beterbangan rendah. Perahu melaju pelan agar tidak mengejutkan mereka. Alif berbisik agar burung tidak terbang jauh.",
+        question: "Mengapa perahu melaju pelan di dekat burung-burung?",
+      },
+      {
+        text: "Perahu berhenti di sebuah kampung di Maro Sebo Ulu. Anak-anak kampung menyambut Alif di dermaga bambu. Mereka bermain bersama sambil bercerita tentang sungai.",
+        question: "Siapa yang menyambut Alif di kampung Maro Sebo Ulu?",
+      },
+      {
+        text: "Alif belajar menangkap ikan dengan jala kecil bersama nelayan Maro Sebo Ulu. Ikan yang kecil dilepas kembali ke sungai. Ikan kecil harus tumbuh besar dulu.",
+        question: "Mengapa ikan kecil dilepas kembali ke sungai?",
+      },
+      {
+        text: "Di kampung Maro Sebo Ulu, Alif membantu ibu-ibu menjemur hasil kebun. Ada pisang, ubi, dan sayur segar dari ladang. Semua dibagi rata untuk warga kampung.",
+        question: "Hasil kebun apa saja yang dijemur di kampung itu?",
+      },
+      {
+        text: "Perahu membawa Alif pulang menyusuri sungai dari Maro Sebo Ulu. Langit sore berwarna jingga di atas air. Alif berjanji menjaga sungai dari hulu sampai ke hilir.",
+        question: "Janji apa yang dibuat Alif untuk sungai?",
+      },
+    ],
+    imagePromptBase:
+      "Warm watercolor children's book illustration of Alif, a young Indonesian boy, on a wooden boat travelling upstream to Maro Sebo Ulu in the Batanghari region, Jambi, Indonesia, with clear river water, dense green banks and a small riverside village, soft light, gentle flat shapes, no text",
+  },
+  {
+    slug: "maro-sebo-ilir",
+    title: "Rawa Ceria Maro Sebo Ilir",
+    subtitle: "Alif mengenal rawa, itik, dan kampung air di Maro Sebo Ilir",
+    character: "Alif",
+    palette: { sky: "#e0f2f1", land: "#6a994e", accent: "#e07a5f" },
+    pages: [
+      {
+        text: "Alif berkunjung ke kampung air di Maro Sebo Ilir. Rumah-rumah berdiri di atas tiang kayu yang tinggi. Di bawahnya, air rawa mengalir pelan.",
+        question: "Mengapa rumah di Maro Sebo Ilir berdiri di atas tiang tinggi?",
+      },
+      {
+        text: "Di rawa Maro Sebo Ilir, Alif melihat itik-itik berenang berbaris. Itik mencari makan di air yang dangkal. Bunyi kwek-kwek membuat Alif tertawa.",
+        question: "Apa yang dicari itik di air rawa?",
+      },
+      {
+        text: "Alif membantu Kak Rina mengumpulkan telur itik di kandang kayu. Telur dibersihkan pelan-pelan agar tidak pecah. Sebagian telur akan dibuat menjadi telur asin yang gurih.",
+        question: "Telur itik bisa dibuat menjadi makanan apa?",
+      },
+      {
+        text: "Dengan perahu kecil, Alif menyusuri rawa Maro Sebo Ilir bersama Kak Rina. Teratai merah muda mekar di permukaan air. Katak bernyanyi dari balik daun teratai.",
+        question: "Bunga apa yang mekar di rawa Maro Sebo Ilir?",
+      },
+      {
+        text: "Alif belajar bahwa rawa menyimpan air saat hujan datang. Rawa yang bersih mencegah kampung kebanjiran besar. Karena itu, warga Maro Sebo Ilir tidak membuang sampah ke rawa.",
+        question: "Mengapa rawa yang bersih penting bagi kampung?",
+      },
+      {
+        text: "Sebelum pulang, Alif menggambar itik dan teratai di buku kecilnya. Maro Sebo Ilir mengajarkan Alif bahwa air adalah rumah bagi banyak makhluk. Alif ingin menjaga rawa selamanya.",
+        question: "Apa yang digambar Alif di buku kecilnya?",
+      },
+    ],
+    imagePromptBase:
+      "Warm watercolor children's book illustration of Alif, a young Indonesian boy, in a wetland village in Maro Sebo Ilir, Batanghari region, Jambi, Indonesia, with stilt houses, ducks swimming in a swamp and pink lotus flowers, soft light, gentle flat shapes, no text",
+  },
+  {
+    slug: "batin-xxiv",
+    title: "Kebun Karet Batin XXIV",
+    subtitle: "Alif belajar menyadap karet dan menjaga hutan di Batin XXIV",
+    character: "Alif",
+    palette: { sky: "#e8f3d8", land: "#4f772d", accent: "#dda15e" },
+    pages: [
+      {
+        text: "Pagi-pagi sekali, Alif pergi ke kebun karet di Batin XXIV bersama Pak Darma. Embun masih menempel di daun-daun. Udara kebun sejuk dan harum tanah.",
+        question: "Kapan Alif pergi ke kebun karet Batin XXIV?",
+      },
+      {
+        text: "Pak Darma menunjukkan cara menyadap batang pohon karet di Batin XXIV. Kulit batang disayat tipis dengan pisau sadap. Alif menonton dengan saksama dari dekat.",
+        question: "Alat apa yang dipakai untuk menyadap pohon karet?",
+      },
+      {
+        text: "Dari sayatan batang, getah putih menetes pelan ke mangkuk kecil. Alif membantu memegang mangkuk getah dengan hati-hati. Getah itu kelak menjadi karet untuk banyak barang.",
+        question: "Barang apa saja yang dibuat dari karet?",
+      },
+      {
+        text: "Di sela pohon karet Batin XXIV, Alif mendengar suara burung dan jangkrik bersahutan. Pak Darma berkata, kebun yang rimbun adalah rumah satwa juga. Karena itu, pohon tidak boleh ditebang sembarangan.",
+        question: "Mengapa pohon di kebun tidak boleh ditebang sembarangan?",
+      },
+      {
+        text: "Alif membantu mengumpulkan mangkuk getah yang sudah penuh. Mangkuk dibawa ke tempat penampungan di tepi kebun Batin XXIV. Pekerjaan terasa ringan karena dikerjakan bersama-sama.",
+        question: "Ke mana mangkuk getah yang penuh dibawa?",
+      },
+      {
+        text: "Alif pulang dari Batin XXIV membawa cerita tentang pohon karet dan petani yang rajin. Di rumah, Alif melihat sandal dan penghapusnya berasal dari karet. Ternyata, kebun yang jauh terasa dekat sekali.",
+        question: "Benda apa di rumah Alif yang berasal dari karet?",
+      },
+    ],
+    imagePromptBase:
+      "Warm watercolor children's book illustration of Alif, a young Indonesian boy, in a rubber plantation in Batin XXIV, Batanghari region, Jambi, Indonesia, at dawn with rows of rubber trees, small latex cups and soft mist, gentle flat shapes, no text",
+  },
 ];
-
 export function getTheme(themeSlug: string): Theme {
   const theme = THEMES.find((t) => t.slug === themeSlug);
   if (!theme) {

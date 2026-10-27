@@ -4,7 +4,7 @@ import { generateIllustrationSvg, escapeXml } from "../lib/meta/image";
 import { continueStory, getMetaMode } from "../lib/meta/provider";
 
 describe("THEMES", () => {
-  it("has exactly 8 themes with the required slugs", () => {
+  it("has exactly 13 themes with the required slugs", () => {
     expect(THEMES.map((t) => t.slug)).toEqual([
       "sungai-batanghari",
       "hutan-senami",
@@ -14,6 +14,11 @@ describe("THEMES", () => {
       "danau-letang",
       "pasar-terusan",
       "sawah-pemayung",
+      "bajubang",
+      "mersam",
+      "maro-sebo-ulu",
+      "maro-sebo-ilir",
+      "batin-xxiv",
     ]);
   });
 
@@ -128,6 +133,11 @@ describe("developed Batang Hari stories", () => {
       "danau-letang": "Danau Letang",
       "pasar-terusan": "Pasar Terusan",
       "sawah-pemayung": "Pemayung",
+      "bajubang": "Bajubang",
+      "mersam": "Mersam",
+      "maro-sebo-ulu": "Maro Sebo Ulu",
+      "maro-sebo-ilir": "Maro Sebo Ilir",
+      "batin-xxiv": "Batin XXIV",
     };
     for (const theme of THEMES) {
       const allText = theme.pages.map((p) => p.text).join(" ");
@@ -137,7 +147,7 @@ describe("developed Batang Hari stories", () => {
   });
 
   it("continueStory works for the new Batang Hari themes", () => {
-    for (const slug of ["aek-meliuk", "danau-letang", "pasar-terusan", "sawah-pemayung"]) {
+    for (const slug of ["aek-meliuk", "danau-letang", "pasar-terusan", "sawah-pemayung", "bajubang", "mersam", "maro-sebo-ulu", "maro-sebo-ilir", "batin-xxiv"]) {
       const r = continueStory({ themeSlug: slug, pageNumber: 6, imagination: "burung kuau yang pandai bernyanyi", readingLevel: "Pemula" });
       expect(r.next_story_segment.page_number).toBe(7);
       expect(r.next_story_segment.story_text).toContain("burung kuau");

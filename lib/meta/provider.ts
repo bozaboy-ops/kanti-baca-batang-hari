@@ -27,6 +27,11 @@ const PLACES: Record<string, string> = {
   "danau-letang": "tepian Danau Letang",
   "pasar-terusan": "dermaga Pasar Terusan",
   "sawah-pemayung": "sawah hijau di Pemayung",
+  "bajubang": "taman kota minyak Bajubang",
+  "mersam": "kebun durian di Mersam",
+  "maro-sebo-ulu": "kampung di hulu Maro Sebo Ulu",
+  "maro-sebo-ilir": "rawa ceria Maro Sebo Ilir",
+  "batin-xxiv": "kebun karet Batin XXIV",
 };
 
 const QUESTIONS: string[] = [
