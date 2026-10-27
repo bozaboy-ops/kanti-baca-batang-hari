@@ -6,6 +6,8 @@ export const users = pgTable("users", {
   age: integer("age").notNull(),
   subdistrict: text("subdistrict").notNull(),
   readingLevel: text("reading_level").notNull(),
+  parentName: text("parent_name"),
+  parentPhone: text("parent_phone"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -40,3 +42,8 @@ export const storyPages = pgTable("story_pages", {
 }, (t) => [
   uniqueIndex("story_pages_story_id_page_number_unique").on(t.storyId, t.pageNumber),
 ]);
+
+export const appSettings = pgTable("app_settings", {
+  key: text("key").primaryKey(),
+  value: jsonb("value").notNull(),
+});

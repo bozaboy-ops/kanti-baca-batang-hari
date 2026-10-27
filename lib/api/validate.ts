@@ -33,6 +33,14 @@ export interface CreateUserInput {
   age: number;
   subdistrict: string;
   readingLevel: ReadingLevel;
+  parentName: string | null;
+  parentPhone: string | null;
+}
+
+function optionalText(value: unknown, max: number): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim().slice(0, max);
+  return trimmed.length > 0 ? trimmed : null;
 }
 
 export function validateCreateUser(body: unknown): ValidationResult<CreateUserInput> {
@@ -53,7 +61,7 @@ export function validateCreateUser(body: unknown): ValidationResult<CreateUserIn
   if (readingLevel !== "Pemula" && readingLevel !== "Lancar") {
     return fail("Level membaca harus Pemula atau Lancar");
   }
-  return { ok: true, value: { childName: childName.trim(), age, subdistrict, readingLevel } };
+  return { ok: true, value: { childName: childName.trim(), age, subdistrict, readingLevel, parentName: optionalText(body.parentName, 80), parentPhone: optionalText(body.parentPhone, 30) } };
 }
 
 export interface CreateStoryInput {

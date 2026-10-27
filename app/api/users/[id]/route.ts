@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { stories, users } from "@/lib/db/schema";
-import { dbUnavailable, notFound } from "@/lib/api/respond";
+import { badRequest, dbUnavailable, notFound, parseJson } from "@/lib/api/respond";
+import { validateCreateUser } from "@/lib/api/validate";
 import { removeStoryStorage } from "@/lib/api/storage";
 
 export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -22,4 +23,17 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
     try { await removeStoryStorage(sid); } catch { /* storage cleanup is best-effort */ }
   }
   return NextResponse.json({ ok: true });
+}
+export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
+  const { id } = await ctx.params;
+  const body = await parseJson(req);
+  const v = validateCreateUser(body);
+  if (!v.ok) return badRequest(v.error);
+  try {
+    const updated = await db.update(users).set(v.value).where(eq(users.id, id)).returning();
+    if (updated.length === 0) return notFound("Pengguna tidak ditemukan");
+    return NextResponse.json({ user: updated[0] });
+  } catch {
+    return dbUnavailable();
+  }
 }
