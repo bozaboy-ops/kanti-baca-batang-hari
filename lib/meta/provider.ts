@@ -23,6 +23,10 @@ const PLACES: Record<string, string> = {
   "hutan-senami": "Hutan Senami",
   "benteng-tembesi": "Benteng Tembesi",
   "kuliner-tradisi": "pasar makanan tradisional Jambi",
+  "aek-meliuk": "taman Aek Meliuk di Muara Bulian",
+  "danau-letang": "tepian Danau Letang",
+  "pasar-terusan": "dermaga Pasar Terusan",
+  "sawah-pemayung": "sawah hijau di Pemayung",
 };
 
 const QUESTIONS: string[] = [

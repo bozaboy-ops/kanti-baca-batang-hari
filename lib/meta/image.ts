@@ -39,6 +39,18 @@ function sceneShapes(slug: string, palette: { sky: string; land: string; accent:
   if (slug === "benteng-tembesi") {
     return `<g><rect x="180" y="280" width="440" height="190" fill="#b08968"/><rect x="180" y="250" width="60" height="50" fill="#9c6644"/><rect x="300" y="250" width="60" height="50" fill="#9c6644"/><rect x="420" y="250" width="60" height="50" fill="#9c6644"/><rect x="540" y="250" width="60" height="50" fill="#9c6644"/><rect x="365" y="370" width="70" height="100" rx="30" fill="#5f4128"/></g><rect x="0" y="470" width="800" height="130" fill="${palette.land}"/>`;
   }
+  if (slug === "aek-meliuk") {
+    return `<g opacity="0.9"><path d="M0 430 q200 -50 400 -10 t400 -20 v170 h-800 z" fill="#74c0fc" opacity="0.8"/><rect x="120" y="330" width="120" height="14" rx="6" fill="#8a5a2b"/><rect x="130" y="344" width="10" height="36" fill="#6f4518"/><rect x="220" y="344" width="10" height="36" fill="#6f4518"/><circle cx="620" cy="300" r="58" fill="${palette.land}"/><rect x="614" y="330" width="12" height="120" fill="#6f4518"/></g><rect x="0" y="470" width="800" height="130" fill="${palette.land}"/>`;
+  }
+  if (slug === "danau-letang") {
+    return `<g opacity="0.9"><ellipse cx="400" cy="450" rx="360" ry="95" fill="#74c0fc" opacity="0.85"/><ellipse cx="400" cy="440" rx="300" ry="70" fill="#a5d8ff" opacity="0.7"/><circle cx="130" cy="260" r="52" fill="${palette.land}"/><rect x="124" y="285" width="12" height="120" fill="#6f4518"/><circle cx="680" cy="280" r="44" fill="${palette.land}"/></g><rect x="0" y="500" width="800" height="100" fill="${palette.land}"/>`;
+  }
+  if (slug === "pasar-terusan") {
+    return `<g opacity="0.9"><rect x="0" y="400" width="800" height="200" fill="#4dabf7" opacity="0.7"/><rect x="90" y="300" width="200" height="90" fill="#dda15e"/><path d="M80 300 l110 -55 110 55 z" fill="#bc4749"/><rect x="520" y="310" width="180" height="80" fill="#e9c46a"/><path d="M510 310 l100 -50 100 50 z" fill="#606c38"/><rect x="330" y="360" width="90" height="26" rx="6" fill="#8a5a2b"/></g><rect x="0" y="480" width="800" height="120" fill="${palette.land}"/>`;
+  }
+  if (slug === "sawah-pemayung") {
+    return `<g opacity="0.9"><path d="M0 360 h800 v60 h-800 z" fill="#a9d97c"/><path d="M0 420 h800 v50 h-800 z" fill="#8ec96a"/><path d="M0 470 h800 v130 h-800 z" fill="${palette.land}"/><g stroke="#588157" stroke-width="5" stroke-linecap="round"><path d="M120 500 v-38M150 500 v-44M640 505 v-38M670 505 v-44M400 510 v-40"/></g><rect x="600" y="300" width="90" height="60" fill="#b08968"/><path d="M595 300 l50 -34 50 34 z" fill="#8a5a2b"/></g>`;
+  }
   // kuliner-tradisi
   return `<g><rect x="180" y="400" width="440" height="28" rx="8" fill="#8a5a2b"/><rect x="220" y="428" width="18" height="60" fill="#6f4518"/><rect x="562" y="428" width="18" height="60" fill="#6f4518"/><ellipse cx="320" cy="385" rx="65" ry="22" fill="#ffffff"/><ellipse cx="320" cy="378" rx="48" ry="14" fill="${palette.accent}"/><ellipse cx="480" cy="385" rx="65" ry="22" fill="#ffffff"/><ellipse cx="480" cy="378" rx="48" ry="14" fill="#f2cc8f"/></g><rect x="0" y="488" width="800" height="112" fill="${palette.land}"/>`;
 }

@@ -26,26 +26,29 @@ export async function POST(req: Request) {
   } catch {
     return dbUnavailable();
   }
-  const seed = theme.pages[0];
-  const imageUrl = imageUrlFor(story.id, 1);
   try {
-    await writeIllustration(story.id, 1, generateIllustrationSvg(theme.slug, theme.title));
+    for (const [index, seed] of theme.pages.entries()) {
+      await writeIllustration(story.id, index + 1, generateIllustrationSvg(theme.slug, seed.text.slice(0, 60)));
+    }
   } catch {
     return NextResponse.json({ error: "Gagal menyimpan ilustrasi" }, { status: 500 });
   }
   try {
-    const [page] = await db
+    const pages = await db
       .insert(storyPages)
-      .values({
-        storyId: story.id,
-        pageNumber: 1,
-        storyText: seed.text,
-        interactiveQuestion: seed.question,
-        museImagePrompt: theme.imagePromptBase,
-        imageUrl,
-      })
+      .values(
+        theme.pages.map((seed, index) => ({
+          storyId: story.id,
+          pageNumber: index + 1,
+          storyText: seed.text,
+          interactiveQuestion: seed.question,
+          museImagePrompt: theme.imagePromptBase,
+          imageUrl: imageUrlFor(story.id, index + 1),
+        })),
+      )
       .returning();
-    return NextResponse.json({ story, pages: [page] }, { status: 201 });
+    const ordered = [...pages].sort((a, b) => a.pageNumber - b.pageNumber);
+    return NextResponse.json({ story, pages: ordered }, { status: 201 });
   } catch {
     return dbUnavailable();
   }

@@ -4,16 +4,20 @@ import { generateIllustrationSvg, escapeXml } from "../lib/meta/image";
 import { continueStory, getMetaMode } from "../lib/meta/provider";
 
 describe("THEMES", () => {
-  it("has exactly 4 themes with the required slugs", () => {
+  it("has exactly 8 themes with the required slugs", () => {
     expect(THEMES.map((t) => t.slug)).toEqual([
       "sungai-batanghari",
       "hutan-senami",
       "benteng-tembesi",
       "kuliner-tradisi",
+      "aek-meliuk",
+      "danau-letang",
+      "pasar-terusan",
+      "sawah-pemayung",
     ]);
   });
 
-  it("each theme has exactly 2 seed pages, an opening question, Alif, palette and imagePromptBase", () => {
+  it("each theme has exactly 6 seed pages, an opening question, Alif, palette and imagePromptBase", () => {
     for (const theme of THEMES) {
       expect(theme.title.length).toBeGreaterThan(0);
       expect(theme.subtitle.length).toBeGreaterThan(0);
@@ -22,7 +26,7 @@ describe("THEMES", () => {
       expect(theme.palette.land).toMatch(/^#/);
       expect(theme.palette.accent).toMatch(/^#/);
       expect(theme.imagePromptBase.length).toBeGreaterThan(0);
-      expect(theme.pages).toHaveLength(2);
+      expect(theme.pages).toHaveLength(6);
       for (const page of theme.pages) {
         expect(page.text.length).toBeGreaterThan(0);
         expect(page.text).toContain("Alif");
@@ -111,5 +115,33 @@ describe("getMetaMode", () => {
     process.env.META_VOICE_TRANSCRIBE_URL = "https://example.invalid/transcribe";
     process.env.META_API_TOKEN = "token";
     expect(getMetaMode()).toBe("http-configured");
+  });
+});
+describe("developed Batang Hari stories", () => {
+  it("every theme tells a developed local arc mentioning its Batang Hari place", () => {
+    const places: Record<string, string> = {
+      "sungai-batanghari": "Batanghari",
+      "hutan-senami": "Senami",
+      "benteng-tembesi": "Tembesi",
+      "kuliner-tradisi": "gulai",
+      "aek-meliuk": "Aek Meliuk",
+      "danau-letang": "Danau Letang",
+      "pasar-terusan": "Pasar Terusan",
+      "sawah-pemayung": "Pemayung",
+    };
+    for (const theme of THEMES) {
+      const allText = theme.pages.map((p) => p.text).join(" ");
+      expect(allText, theme.slug).toContain(places[theme.slug]);
+      expect(theme.pages[5].question, theme.slug).toContain("?");
+    }
+  });
+
+  it("continueStory works for the new Batang Hari themes", () => {
+    for (const slug of ["aek-meliuk", "danau-letang", "pasar-terusan", "sawah-pemayung"]) {
+      const r = continueStory({ themeSlug: slug, pageNumber: 6, imagination: "burung kuau yang pandai bernyanyi", readingLevel: "Pemula" });
+      expect(r.next_story_segment.page_number).toBe(7);
+      expect(r.next_story_segment.story_text).toContain("burung kuau");
+      expect(r.muse_image_prompt).toContain("Batanghari");
+    }
   });
 });
