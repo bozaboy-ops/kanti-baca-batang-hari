@@ -303,9 +303,9 @@ export default function HomePage() {
             </g>
           </svg>
           {[
-            { name: "Maro Sebo Ulu", left: "12%", top: "20%", color: "#40916c", icon: "M3 15h18l-2.2 4.5H6L3 15Zm9-9v8m0-8 5 5h-5" },
-            { name: "Batin XXIV", left: "37%", top: "11%", color: "#2d6a4f", icon: "M12 2 18 10h-3.5L19 16H5l4.5-6H6L12 2Zm-1.2 14h2.4l.8 6h-4l.8-6Z" },
-            { name: "Bajubang", left: "77%", top: "15%", color: "#bc6c25", icon: "M4 20 14 8l6 6M14 8v12M5 20h15M14 8l4.5-3.5" },
+            { name: "Maro Sebo Ulu", left: "12%", top: "31%", color: "#40916c", icon: "M3 15h18l-2.2 4.5H6L3 15Zm9-9v8m0-8 5 5h-5" },
+            { name: "Batin XXIV", left: "36%", top: "23%", color: "#2d6a4f", icon: "M12 2 18 10h-3.5L19 16H5l4.5-6H6L12 2Zm-1.2 14h2.4l.8 6h-4l.8-6Z" },
+            { name: "Bajubang", left: "77%", top: "26%", color: "#bc6c25", icon: "M4 20 14 8l6 6M14 8v12M5 20h15M14 8l4.5-3.5" },
             { name: "Muara Bulian", left: "43%", top: "40%", color: "#065f46", icon: "M12 2 18 10h-3.5L19 16H5l4.5-6H6L12 2Zm-1.2 14h2.4l.8 6h-4l.8-6Z" },
             { name: "Muara Tembesi", left: "61%", top: "53%", color: "#9c6644", icon: "M4 21V9h3V6h3v3h4V6h3v3h3v12h-6v-5a2 2 0 0 0-4 0v5H4Z" },
             { name: "Mersam", left: "86%", top: "42%", color: "#bc4749", icon: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm0 0v4m6.5 2-3.5 2m3.5 7-3.5-2M5.5 20l3.5-2M5.5 9l3.5 2" },
