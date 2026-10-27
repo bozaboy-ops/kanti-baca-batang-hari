@@ -1,0 +1,7 @@
+﻿.superpowers/
+pgdata/
+storage/
+backups/
+.env.local
+node_modules/
+.next/
