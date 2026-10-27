@@ -1,5 +1,5 @@
-const SHELL_CACHE = "bacca-shell-v1";
-const IMAGE_CACHE = "bacca-images-v1";
+const SHELL_CACHE = "kanti-shell-v2";
+const IMAGE_CACHE = "kanti-images-v2";
 const SHELL_URLS = ["/", "/ringkasan", "/icon.svg", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
@@ -39,5 +39,17 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  event.respondWith(caches.match(request).then((hit) => hit || fetch(request)));
+  // Network-first for pages and assets so UI updates are never stuck
+  // behind a stale cache; fall back to cache only when offline.
+  event.respondWith(
+    fetch(request)
+      .then((res) => {
+        if (res.ok && url.origin === self.location.origin) {
+          const copy = res.clone();
+          caches.open(SHELL_CACHE).then((cache) => cache.put(request, copy));
+        }
+        return res;
+      })
+      .catch(() => caches.match(request))
+  );
 });
