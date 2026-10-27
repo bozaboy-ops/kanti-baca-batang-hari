@@ -49,6 +49,9 @@ export default function StoryBook({ storyId }: { storyId: string }) {
   const [continuing, setContinuing] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [provider, setProvider] = useState<string | null>(null);
+  const [completion, setCompletion] = useState<{ stars: number; badge: string | null; averageScore: number | null } | null>(null);
+  const [completing, setCompleting] = useState(false);
+  const [downloadState, setDownloadState] = useState<string | null>(null);
   const [textSize, setTextSize] = useState(1);
 
   useEffect(() => {
@@ -97,6 +100,35 @@ export default function StoryBook({ storyId }: { storyId: string }) {
   }, [continuing]);
 
   const page = pages[pageIndex] ?? null;
+  const isLastPage = pages.length > 0 && pageIndex === pages.length - 1;
+
+  async function handleComplete() {
+    setActionError(null);
+    setCompleting(true);
+    try {
+      const res = await fetch(`/api/stories/${storyId}/complete`, { method: "POST" });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error ?? "Cerita belum bisa ditamatkan");
+      setCompletion({ stars: data.stars ?? 1, badge: data.badge ?? null, averageScore: data.averageScore ?? null });
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : "Cerita belum bisa ditamatkan");
+    } finally {
+      setCompleting(false);
+    }
+  }
+
+  async function handleDownload() {
+    setDownloadState("Menyimpan cerita...");
+    try {
+      if (!("caches" in window)) throw new Error("unsupported");
+      const cache = await caches.open("kanti-stories-v3");
+      const urls = [`/api/stories/${storyId}`, ...pages.map((p) => p.imageUrl).filter((u): u is string => Boolean(u))];
+      await cache.addAll(urls);
+      setDownloadState("Cerita tersimpan. Bisa dibuka lagi tanpa internet dari halaman ini.");
+    } catch {
+      setDownloadState("Belum bisa menyimpan cerita di peramban ini.");
+    }
+  }
 
   async function handleEvaluate() {
     if (!page) return;
@@ -288,6 +320,35 @@ export default function StoryBook({ storyId }: { storyId: string }) {
         <button type="button" onClick={handleContinue} disabled={continuing || !imagination.trim()} className="mt-5 w-full rounded-2xl bg-amber-500 px-5 py-3.5 font-display text-lg font-semibold text-white transition-colors hover:bg-amber-600 disabled:opacity-40 sm:w-auto">
           {continuing ? "Membuat Halaman Baru..." : "Buat Halaman Baru"}
         </button>
+      </section>
+
+      <section aria-label="Unduh dan tamatkan cerita" className="lux-card mt-5 rounded-[1.75rem] p-5 sm:p-6">
+        <h2 className="font-display text-xl font-semibold text-emerald-950">Simpan & Tamatkan</h2>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <button type="button" onClick={() => void handleDownload()} className="rounded-full border-2 border-emerald-700 px-5 py-2.5 font-semibold text-emerald-800 transition-colors hover:bg-emerald-700 hover:text-white focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400">Unduh Cerita Ini</button>
+          {isLastPage && !completion && (
+            <button type="button" onClick={() => void handleComplete()} disabled={completing} className="rounded-full bg-amber-500 px-5 py-2.5 font-display font-semibold text-white transition-colors hover:bg-amber-600 disabled:opacity-40 focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-500">
+              {completing ? "Menyimpan..." : "Tamatkan Cerita & Kumpulkan Bintang"}
+            </button>
+          )}
+        </div>
+        {downloadState && <p className="mt-3 text-sm font-medium text-emerald-800" aria-live="polite">{downloadState}</p>}
+        {completion && (
+          <div className="mt-5 rounded-2xl bg-emerald-800 px-5 py-5 text-white" aria-live="polite">
+            <p className="font-display text-2xl font-semibold">Cerita Tamat. Hebat Sekali!</p>
+            <p className="mt-2 flex items-center gap-1.5" aria-label={`Bintang ${completion.stars} dari 3`}>
+              {[1, 2, 3].map((star) => (
+                <svg key={star} viewBox="0 0 24 24" className={`h-9 w-9 ${star <= completion.stars ? "text-amber-400" : "text-white/30"}`} fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" /></svg>
+              ))}
+              <span className="ml-2 font-semibold">{completion.stars} dari 3 bintang</span>
+            </p>
+            {completion.averageScore !== null && <p className="mt-1 text-emerald-50">Skor rata-rata bacaanmu: {completion.averageScore}</p>}
+            {completion.badge && <p className="mt-3 inline-block rounded-full bg-amber-400 px-4 py-1.5 font-display font-semibold text-emerald-950">Lencana: {completion.badge}</p>}
+            <div className="mt-4">
+              <Link href="/ringkasan" className="inline-block rounded-full bg-white px-5 py-2.5 font-semibold text-emerald-800 hover:bg-amber-300 hover:text-emerald-950">Lihat Bintang & Lencanaku</Link>
+            </div>
+          </div>
+        )}
       </section>
     </main>
   );

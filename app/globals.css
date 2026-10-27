@@ -56,3 +56,17 @@ body {
     }
   }
 }
+@media print {
+  body {
+    color: #000000;
+  }
+  .lux-panel {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    box-shadow: none;
+  }
+  .lux-card {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}

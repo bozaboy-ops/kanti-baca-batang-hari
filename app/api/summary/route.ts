@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { stories, storyPages, users } from "@/lib/db/schema";
 import { dbUnavailable, normalizeStoredTrickyWords } from "@/lib/api/respond";
+import { computeBadges } from "@/lib/content/badges";
 
 export async function GET() {
   try {
@@ -43,7 +44,10 @@ export async function GET() {
           createdAt: p.createdAt,
         }));
 
-      return { user, storyCount: userStories.length, averageScore, frequentTrickyWords, recentPages };
+      const completedStories = userStories.filter((story) => story.completedAt);
+      const totalStars = completedStories.reduce((sum, story) => sum + (story.stars ?? 0), 0);
+      const badges = computeBadges(completedStories.map((story) => story.themeSlug));
+      return { user, storyCount: userStories.length, completedCount: completedStories.length, totalStars, badges, averageScore, frequentTrickyWords, recentPages };
     });
 
     return NextResponse.json({ users: result });

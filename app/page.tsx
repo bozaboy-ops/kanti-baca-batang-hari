@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { THEMES } from "@/lib/content/themes";
+import { PARENT_PIN_KEY, verifyPin } from "@/lib/parent/pin";
 
 // Duplicated client-side from the API kecamatan list (Task 4 contract).
 const KECAMATAN = [
@@ -69,6 +70,23 @@ export default function HomePage() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("Semua");
   const [lastStory, setLastStory] = useState<{ storyId: string; title: string; pageNumber: number } | null>(null);
+  const [completedSlugs, setCompletedSlugs] = useState<Set<string>>(new Set());
+  const [deletePin, setDeletePin] = useState("");
+  const [pinSet, setPinSet] = useState(false);
+
+  useEffect(() => { setPinSet(Boolean(window.localStorage.getItem(PARENT_PIN_KEY))); }, []);
+
+  useEffect(() => {
+    if (!selectedId) { setCompletedSlugs(new Set()); return; }
+    void (async () => {
+      try {
+        const res = await fetch("/api/summary");
+        const data = await res.json().catch(() => null);
+        const entry = Array.isArray(data?.users) ? data.users.find((u: { user: { id: string } }) => u.user.id === selectedId) : null;
+        setCompletedSlugs(new Set(entry ? (entry.badges as { slug: string }[]).map((b) => b.slug) : []));
+      } catch { setCompletedSlugs(new Set()); }
+    })();
+  }, [selectedId]);
 
   useEffect(() => {
     if (!selectedId) { setLastStory(null); return; }
@@ -135,6 +153,12 @@ export default function HomePage() {
 
   async function handleDelete(id: string) {
     setError(null);
+    const storedPin = window.localStorage.getItem(PARENT_PIN_KEY);
+    if (storedPin && !verifyPin(deletePin, storedPin)) {
+      setError("Masukkan PIN orang tua yang benar untuk menghapus profil.");
+      return;
+    }
+    setDeletePin("");
     try {
       const res = await fetch(`/api/users/${id}`, { method: "DELETE" });
       const data = await res.json().catch(() => null);
@@ -220,6 +244,47 @@ export default function HomePage() {
         </div>
       )}
 
+      <section aria-label="Pilih cerita lewat peta Batang Hari" className="lux-card mt-8 rounded-[1.75rem] p-5 sm:p-6">
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="font-display text-2xl font-semibold text-emerald-950">Pilih Cerita Lewat Peta</h2>
+            <p className="mt-1 text-emerald-800">Ketuk nama kecamatan untuk menyaring ceritanya. Peta ilustrasi, bukan peta resmi berskala.</p>
+          </div>
+          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">8 KECAMATAN</span>
+        </div>
+        <div className="relative mt-5 h-80 overflow-hidden rounded-[1.25rem] border border-emerald-900/10 bg-emerald-50 sm:h-96">
+          <svg viewBox="0 0 800 420" className="absolute inset-0 h-full w-full" aria-hidden="true" preserveAspectRatio="none">
+            <path d="M-20 300 C140 250, 240 330, 390 260 S650 150, 830 190" fill="none" stroke="#74c0fc" strokeWidth="34" strokeLinecap="round" opacity="0.75" />
+            <path d="M120 -20 C180 110, 130 220, 230 430" fill="none" stroke="#a5d8ff" strokeWidth="16" strokeLinecap="round" opacity="0.7" />
+            <circle cx="660" cy="250" r="52" fill="#a5d8ff" opacity="0.8" />
+            <circle cx="95" cy="95" r="70" fill="#d3f9d8" opacity="0.9" />
+            <circle cx="715" cy="80" r="58" fill="#fff3bf" opacity="0.9" />
+          </svg>
+          {[
+            { name: "Maro Sebo Ulu", left: "11%", top: "16%" },
+            { name: "Batin XXIV", left: "36%", top: "8%" },
+            { name: "Bajubang", left: "76%", top: "13%" },
+            { name: "Muara Bulian", left: "43%", top: "39%" },
+            { name: "Muara Tembesi", left: "61%", top: "50%" },
+            { name: "Mersam", left: "85%", top: "40%" },
+            { name: "Maro Sebo Ilir", left: "79%", top: "66%" },
+            { name: "Pemayung", left: "52%", top: "76%" },
+          ].map((node) => (
+            <button
+              key={node.name}
+              type="button"
+              onClick={() => { setFilter(node.name); document.getElementById("daftar-cerita")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}
+              aria-pressed={filter === node.name}
+              className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full border-2 px-3.5 py-2 text-xs font-bold shadow-sm transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400 sm:text-sm ${filter === node.name ? "border-emerald-800 bg-emerald-800 text-white" : "border-emerald-700/40 bg-white text-emerald-900 hover:border-emerald-700"}`}
+              style={{ left: node.left, top: node.top }}
+            >
+              {node.name}
+            </button>
+          ))}
+          <span className="absolute bottom-3 left-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-emerald-800">Sungai Batanghari mengalir dari hulu ke hilir</span>
+        </div>
+      </section>
+
       <div className="mt-8 grid items-start gap-6 lg:grid-cols-[380px_1fr]">
         <section aria-label="Profil anak" className="lux-card rounded-[1.75rem] p-5 sm:p-6 lg:sticky lg:top-6">
           <p className="text-xs font-bold tracking-wide text-amber-600">LANGKAH 1</p>
@@ -263,7 +328,8 @@ export default function HomePage() {
                       {selected && <span className="mt-0.5 block text-sm font-semibold text-emerald-700">Profil dipilih - siap memilih cerita</span>}
                     </button>
                     {confirmDeleteId === user.id ? (
-                      <span className="flex shrink-0 items-center gap-2">
+                      <span className="flex shrink-0 flex-wrap items-center gap-2">
+                        {pinSet && <input value={deletePin} onChange={(e) => setDeletePin(e.target.value.replace(/\D/g, "").slice(0, 6))} inputMode="numeric" type="password" aria-label="PIN orang tua untuk menghapus profil" placeholder="PIN" className="w-20 rounded-full border border-amber-500 px-3 py-1.5 text-sm focus:outline-none" />}
                         <button type="button" onClick={() => void handleDelete(user.id)} aria-label={`Konfirmasi hapus profil ${user.childName}`} className="rounded-full bg-amber-500 px-3.5 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-amber-600">Ya, Hapus {user.childName}</button>
                         <button type="button" onClick={() => setConfirmDeleteId(null)} className="rounded-full border-2 border-emerald-600 px-3.5 py-1.5 text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-50">Batal</button>
                       </span>
@@ -277,7 +343,7 @@ export default function HomePage() {
           )}
         </section>
 
-        <section aria-label="Pilih tema cerita">
+        <section aria-label="Pilih tema cerita" id="daftar-cerita" className="scroll-mt-6">
           <p className="text-xs font-bold tracking-wide text-amber-600">LANGKAH 2</p>
           <div className="mt-1 flex flex-wrap items-end justify-between gap-3">
             <h2 className="font-display text-3xl font-semibold text-emerald-950">Pilih Cerita Batang Hari</h2>
@@ -303,6 +369,7 @@ export default function HomePage() {
                   <p className="flex h-7 flex-nowrap items-center gap-2 overflow-hidden text-xs font-bold text-emerald-700">
                     <span className="shrink-0 rounded-full bg-emerald-50 px-3 py-1 whitespace-nowrap">6 HALAMAN</span>
                     <span className="truncate rounded-full bg-amber-50 px-3 py-1 whitespace-nowrap text-amber-700">{THEME_KECAMATAN[theme.slug].toUpperCase()}</span>
+                    {completedSlugs.has(theme.slug) && <span className="shrink-0 rounded-full bg-emerald-700 px-3 py-1 whitespace-nowrap text-white">SUDAH TAMAT</span>}
                   </p>
                   <p className="mt-3 text-sm text-emerald-700">Sekitar {theme.pages.reduce((total, page) => total + page.text.split(/\s+/).filter(Boolean).length, 0)} kata bacaan</p>
                   <span className="min-h-4 flex-1" aria-hidden="true" />

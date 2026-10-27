@@ -15,6 +15,8 @@ export const stories = pgTable("stories", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   themeSlug: text("theme_slug").notNull(),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
+  stars: integer("stars"),
   title: text("title").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });

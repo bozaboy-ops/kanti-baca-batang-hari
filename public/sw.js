@@ -1,5 +1,6 @@
-const SHELL_CACHE = "kanti-shell-v2";
-const IMAGE_CACHE = "kanti-images-v2";
+const SHELL_CACHE = "kanti-shell-v3";
+const IMAGE_CACHE = "kanti-images-v3";
+const STORY_CACHE = "kanti-stories-v3";
 const SHELL_URLS = ["/", "/ringkasan", "/icon.svg", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
@@ -11,7 +12,7 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.filter((k) => k !== SHELL_CACHE && k !== IMAGE_CACHE).map((k) => caches.delete(k)))
+      Promise.all(keys.filter((k) => k !== SHELL_CACHE && k !== IMAGE_CACHE && k !== STORY_CACHE).map((k) => caches.delete(k)))
     ).then(() => self.clients.claim())
   );
 });
@@ -30,6 +31,23 @@ self.addEventListener("fetch", (event) => {
         if (res.ok) cache.put(request, res.clone());
         return res;
       })
+    );
+    return;
+  }
+
+  if (url.pathname.startsWith("/api/stories/")) {
+    // Downloaded stories: network-first, cache fallback so a saved story
+    // still opens offline. Other API calls stay network-only.
+    event.respondWith(
+      fetch(request)
+        .then((res) => {
+          if (res.ok) {
+            const copy = res.clone();
+            caches.open(STORY_CACHE).then((cache) => cache.put(request, copy));
+          }
+          return res;
+        })
+        .catch(() => caches.open(STORY_CACHE).then((cache) => cache.match(request)))
     );
     return;
   }
