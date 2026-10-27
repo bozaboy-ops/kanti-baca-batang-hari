@@ -68,6 +68,15 @@ export default function HomePage() {
   const [loadFailed, setLoadFailed] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [filter, setFilter] = useState<string>("Semua");
+  const [lastStory, setLastStory] = useState<{ storyId: string; title: string; pageNumber: number } | null>(null);
+
+  useEffect(() => {
+    if (!selectedId) { setLastStory(null); return; }
+    try {
+      const raw = window.localStorage.getItem(`kanti.lastStory.${selectedId}`);
+      setLastStory(raw ? (JSON.parse(raw) as { storyId: string; title: string; pageNumber: number }) : null);
+    } catch { setLastStory(null); }
+  }, [selectedId]);
 
   const loadUsers = useCallback(async () => {
     try {
@@ -194,9 +203,14 @@ export default function HomePage() {
       </section>
 
       {selectedUser && (
-        <p className="mt-5 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-3.5 font-medium text-emerald-950" aria-live="polite">
-          Siap membaca sebagai <strong>{selectedUser.childName}</strong> · {selectedUser.age} tahun · {selectedUser.subdistrict} · Level {selectedUser.readingLevel}. Sekarang pilih ceritanya di bawah.
-        </p>
+        <div className="mt-5 flex flex-wrap items-center gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-3.5 font-medium text-emerald-950" aria-live="polite">
+          <span className="flex-1">Siap membaca sebagai <strong>{selectedUser.childName}</strong> · {selectedUser.age} tahun · {selectedUser.subdistrict} · Level {selectedUser.readingLevel}. Sekarang pilih ceritanya di bawah.</span>
+          {lastStory && (
+            <button type="button" onClick={() => router.push(`/baca/${lastStory.storyId}`)} className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400">
+              Lanjutkan: {lastStory.title} (Halaman {lastStory.pageNumber})
+            </button>
+          )}
+        </div>
       )}
 
       {error && (
@@ -290,6 +304,7 @@ export default function HomePage() {
                     <span className="shrink-0 rounded-full bg-emerald-50 px-3 py-1 whitespace-nowrap">6 HALAMAN</span>
                     <span className="truncate rounded-full bg-amber-50 px-3 py-1 whitespace-nowrap text-amber-700">{THEME_KECAMATAN[theme.slug].toUpperCase()}</span>
                   </p>
+                  <p className="mt-3 text-sm text-emerald-700">Sekitar {theme.pages.reduce((total, page) => total + page.text.split(/\s+/).filter(Boolean).length, 0)} kata bacaan</p>
                   <span className="min-h-4 flex-1" aria-hidden="true" />
                   <button type="button" disabled={!selectedId || busyTheme !== null} onClick={() => void handleStart(theme.slug)} className="w-full rounded-xl bg-emerald-700 px-5 py-3 font-display text-base font-semibold text-white transition-colors hover:bg-emerald-800 disabled:opacity-40">
                     {busyTheme === theme.slug ? "Membuat Cerita..." : "Mulai Baca"}

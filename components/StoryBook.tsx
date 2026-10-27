@@ -5,11 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Recorder from "./Recorder";
 import { highlightWords } from "@/lib/reading/highlight";
+import { TEXT_SIZE_CLASSES, clampTextSizeIndex, speakIndonesian, stopSpeaking } from "@/lib/reading/speech";
 
 interface StoryData {
   id: string;
   title: string;
   themeSlug: string;
+  userId: string;
 }
 interface PageData {
   id: string;
@@ -47,6 +49,20 @@ export default function StoryBook({ storyId }: { storyId: string }) {
   const [continuing, setContinuing] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [provider, setProvider] = useState<string | null>(null);
+  const [textSize, setTextSize] = useState(1);
+
+  useEffect(() => {
+    const saved = Number(window.localStorage.getItem("kanti.textSize"));
+    if (window.localStorage.getItem("kanti.textSize") !== null) setTextSize(clampTextSizeIndex(saved));
+  }, []);
+
+  useEffect(() => { stopSpeaking(); }, [pageIndex]);
+
+  useEffect(() => {
+    if (!story) return;
+    const record = { storyId: story.id, title: story.title, pageNumber: (pages[pageIndex]?.pageNumber ?? 1), updatedAt: new Date().toISOString() };
+    window.localStorage.setItem(`kanti.lastStory.${story.userId}`, JSON.stringify(record));
+  }, [story, pages, pageIndex]);
 
   const loadStory = useCallback(async () => {
     try {
@@ -193,13 +209,27 @@ export default function StoryBook({ storyId }: { storyId: string }) {
           <div className="flex aspect-[16/9] w-full items-center justify-center bg-emerald-50 text-emerald-700">Ilustrasi belum tersedia</div>
         )}
         <div className="p-5 sm:p-7">
-          <p className="font-display text-2xl leading-relaxed font-medium text-emerald-950 sm:text-3xl">
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <button type="button" onClick={() => { if (!speakIndonesian(page.storyText)) setActionError("Suara bacaan belum tersedia di peramban ini. Minta bantuan orang tua membaca dulu, ya."); }} className="rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-800 focus:outline-none focus-visible:ring-4 focus-visible:ring-amber-400">
+              Dengarkan Halaman Ini
+            </button>
+            <span className="ml-auto flex items-center gap-1" role="group" aria-label="Ukuran huruf">
+              <span className="mr-1 text-xs font-bold text-emerald-700">UKURAN HURUF</span>
+              {["Kecil", "Sedang", "Besar"].map((label, i) => (
+                <button key={label} type="button" aria-pressed={textSize === i} onClick={() => { setTextSize(i); window.localStorage.setItem("kanti.textSize", String(i)); }} className={`rounded-full px-3 py-1.5 text-sm font-semibold ${textSize === i ? "bg-amber-500 text-white" : "border border-emerald-600 text-emerald-700 hover:bg-emerald-50"}`}>{label}</button>
+              ))}
+            </span>
+          </div>
+          <p className={`font-display font-medium text-emerald-950 ${TEXT_SIZE_CLASSES[textSize]}`}>
             {highlighted.map((item, i) => (
-              <span key={`${i}-${item.word}`} className={item.correct ? "font-semibold text-emerald-600" : undefined}>
-                {item.word}{i < highlighted.length - 1 ? " " : ""}
+              <span key={`${i}-${item.word}`}>
+                <button type="button" onClick={() => speakIndonesian(item.word)} title={`Dengarkan kata: ${item.word}`} aria-label={`Dengarkan kata ${item.word}`} className={`rounded-md px-0.5 -mx-0.5 hover:bg-amber-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ${item.correct ? "font-semibold text-emerald-600" : ""}`}>
+                  {item.word}
+                </button>{i < highlighted.length - 1 ? " " : ""}
               </span>
             ))}
           </p>
+          <p className="mt-3 text-sm text-emerald-700">Ketuk kata mana pun untuk mendengar cara membacanya.</p>
           <div className="mt-5 flex flex-wrap gap-2">
             <button type="button" disabled={pageIndex <= 0} onClick={() => setPageIndex((i) => Math.max(0, i - 1))} className="rounded-full border-2 border-emerald-600 px-4 py-2 text-sm font-semibold text-emerald-700 disabled:opacity-40">Halaman Sebelumnya</button>
             <button type="button" disabled={pageIndex >= pages.length - 1} onClick={() => setPageIndex((i) => Math.min(pages.length - 1, i + 1))} className="rounded-full border-2 border-emerald-600 px-4 py-2 text-sm font-semibold text-emerald-700 disabled:opacity-40">Halaman Berikutnya</button>
