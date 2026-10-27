@@ -39,6 +39,10 @@ function normalize(token: string): string {
   return stripPunctuation(token.toLowerCase());
 }
 
+export function normalizeToken(token: string): string {
+  return normalize(token);
+}
+
 function transcriptVariant(normalizedTranscriptToken: string): string {
   if (normalizedTranscriptToken.endsWith("o")) {
     return normalizedTranscriptToken.slice(0, -1) + "a";
