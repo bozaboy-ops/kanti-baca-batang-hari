@@ -20,8 +20,9 @@ interface AdminEntry {
 export default function AdminPage() {
   const [checking, setChecking] = useState(true);
   const [unlocked, setUnlocked] = useState(false);
-  const [keyInput, setKeyInput] = useState("");
-  const [keyError, setKeyError] = useState<string | null>(null);
+  const [usernameInput, setUsernameInput] = useState("");
+  const [passwordInput, setPasswordInput] = useState("");
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [entries, setEntries] = useState<AdminEntry[]>([]);
   const [settings, setSettings] = useState<AppSettings>({ disabledThemes: [], weeklyTarget: 10 });
   const [loading, setLoading] = useState(false);
@@ -64,19 +65,20 @@ export default function AdminPage() {
 
   async function handleUnlock(event: React.FormEvent) {
     event.preventDefault();
-    setKeyError(null);
+    setLoginError(null);
     try {
       const res = await fetch("/api/admin/session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ key: keyInput }),
+        body: JSON.stringify({ username: usernameInput, password: passwordInput }),
       });
       const data = await res.json().catch(() => null);
-      if (!res.ok) throw new Error(data?.error ?? "Kunci pemilik belum tepat");
-      setKeyInput("");
+      if (!res.ok) throw new Error(data?.error ?? "Username atau sandi belum tepat");
+      setUsernameInput("");
+      setPasswordInput("");
       setUnlocked(true);
     } catch (err) {
-      setKeyError(err instanceof Error ? err.message : "Kunci pemilik belum tepat");
+      setLoginError(err instanceof Error ? err.message : "Username atau sandi belum tepat");
     }
   }
 
@@ -157,14 +159,17 @@ export default function AdminPage() {
       <main className="mx-auto w-full max-w-md px-4 py-10 sm:py-14">
         <section className="lux-card rounded-[2rem] p-6 sm:p-8">
           <span className="gold-rule block h-1 w-14 rounded-full" aria-hidden="true" />
-          <h1 className="font-display mt-4 text-3xl font-semibold text-emerald-950">Admin Pemilik Terkunci</h1>
-          <p className="mt-2 text-emerald-800">Masukkan kunci pemilik untuk mengelola aplikasi. Kunci ini hanya diketahui pemilik dan diperiksa di server — tidak bisa dibuat dari perangkat lain.</p>
+          <h1 className="font-display mt-4 text-3xl font-semibold text-emerald-950">Login Admin Pemilik</h1>
+          <p className="mt-2 text-emerald-800">Halaman khusus pemilik. Masukkan username dan sandi admin — hanya pemilik yang memilikinya.</p>
           <form onSubmit={handleUnlock} className="mt-5 space-y-3">
-            <label className="block text-sm font-semibold text-emerald-900">Kunci pemilik
-              <input value={keyInput} onChange={(e) => setKeyInput(e.target.value)} type="password" autoComplete="current-password" className={inputClass} placeholder="Kunci pemilik" />
+            <label className="block text-sm font-semibold text-emerald-900">Username
+              <input value={usernameInput} onChange={(e) => setUsernameInput(e.target.value)} type="text" autoComplete="username" className={inputClass} placeholder="Username admin" />
             </label>
-            {keyError && <p role="alert" className="rounded-xl bg-amber-100 px-4 py-2 text-sm font-medium text-amber-900">{keyError}</p>}
-            <button type="submit" className="w-full rounded-xl bg-emerald-700 px-5 py-3 font-display text-lg font-semibold text-white hover:bg-emerald-800">Buka Admin</button>
+            <label className="block text-sm font-semibold text-emerald-900">Sandi
+              <input value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} type="password" autoComplete="current-password" className={inputClass} placeholder="Sandi admin" />
+            </label>
+            {loginError && <p role="alert" className="rounded-xl bg-amber-100 px-4 py-2 text-sm font-medium text-amber-900">{loginError}</p>}
+            <button type="submit" className="w-full rounded-xl bg-emerald-700 px-5 py-3 font-display text-lg font-semibold text-white hover:bg-emerald-800">Masuk sebagai Admin</button>
           </form>
           <p className="mt-4 text-center"><Link href="/" className="font-semibold text-emerald-700">Kembali ke Beranda</Link></p>
         </section>

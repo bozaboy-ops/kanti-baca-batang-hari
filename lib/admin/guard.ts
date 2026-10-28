@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { OWNER_COOKIE, getOwnerSecret, verifyOwnerSession } from "./session";
+import { OWNER_COOKIE, verifyOwnerSession } from "./session";
+import { getAdminPasswordHash, getAdminUsername } from "./credentials";
 
 export function readOwnerCookie(req: Request): string | null {
   const header = req.headers.get("cookie") ?? "";
@@ -12,18 +13,14 @@ export function readOwnerCookie(req: Request): string | null {
 }
 
 export function isOwnerRequest(req: Request): boolean {
-  const secret = getOwnerSecret();
-  if (!secret) return false;
+  const secret = getAdminPasswordHash();
+  if (!secret || !getAdminUsername()) return false;
   return verifyOwnerSession(readOwnerCookie(req), secret);
 }
 
-export function ownerKeyConfigured(): boolean {
-  return getOwnerSecret() !== null;
-}
-
-// Fail closed: tanpa OWNER_KEY yang valid di server, semua fungsi admin menolak.
+// Fail closed: tanpa kredensial admin di server, semua fungsi admin menolak.
 export function ownerRequired(req: Request): NextResponse | null {
-  if (!ownerKeyConfigured()) {
+  if (!getAdminUsername() || !getAdminPasswordHash()) {
     return NextResponse.json({ error: "Fungsi pemilik belum dikonfigurasi di server" }, { status: 503 });
   }
   if (!isOwnerRequest(req)) {

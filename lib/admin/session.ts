@@ -43,8 +43,3 @@ export function verifyOwnerSession(cookieValue: string | null | undefined, secre
   if (provided.length !== expected.length) return false;
   return timingSafeEqual(provided, expected);
 }
-
-export function getOwnerSecret(): string | null {
-  const secret = process.env.OWNER_KEY ?? "";
-  return secret.length >= 16 ? secret : null;
-}

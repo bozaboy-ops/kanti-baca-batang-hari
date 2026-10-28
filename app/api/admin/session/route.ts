@@ -1,38 +1,55 @@
 import { NextResponse } from "next/server";
-import { timingSafeEqual } from "crypto";
 import { parseJson } from "@/lib/api/respond";
-import { OWNER_COOKIE, OWNER_SESSION_MAX_AGE, createOwnerSession, getOwnerSecret } from "@/lib/admin/session";
+import { createOwnerSession, OWNER_COOKIE, OWNER_SESSION_MAX_AGE } from "@/lib/admin/session";
+import {
+  LOGIN_LIMIT,
+  LOGIN_WINDOW_MS,
+  getAdminPasswordHash,
+  getAdminUsername,
+  loginAllowed,
+  recordFailedLogin,
+  verifyAdminCredentials,
+  type LoginAttemptStore,
+} from "@/lib/admin/credentials";
 import { isOwnerRequest } from "@/lib/admin/guard";
 
-export async function GET(req: Request) {
-  return NextResponse.json({ ok: isOwnerRequest(req) });
-}
+const attempts: LoginAttemptStore = new Map();
 
 function cookieHeader(value: string, maxAge: number): string {
   const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
   return `${OWNER_COOKIE}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${maxAge}${secure}`;
 }
 
-function keysMatch(provided: unknown, secret: string): boolean {
-  if (typeof provided !== "string" || provided.length === 0) return false;
-  const a = Buffer.from(provided, "utf8");
-  const b = Buffer.from(secret, "utf8");
-  if (a.length !== b.length) return false;
-  return timingSafeEqual(a, b);
+function clientIp(req: Request): string {
+  const forwarded = req.headers.get("x-forwarded-for");
+  if (forwarded) return forwarded.split(",")[0].trim();
+  return req.headers.get("x-real-ip")?.trim() || "unknown";
+}
+
+export async function GET(req: Request) {
+  return NextResponse.json({ ok: isOwnerRequest(req) });
 }
 
 export async function POST(req: Request) {
-  const secret = getOwnerSecret();
-  if (!secret) {
+  const username = getAdminUsername();
+  const passwordHash = getAdminPasswordHash();
+  if (!username || !passwordHash) {
     return NextResponse.json({ error: "Fungsi pemilik belum dikonfigurasi di server" }, { status: 503 });
   }
-  const body = await parseJson(req);
-  const key = typeof body === "object" && body !== null ? (body as Record<string, unknown>).key : null;
-  if (!keysMatch(key, secret)) {
-    return NextResponse.json({ error: "Kunci pemilik belum tepat" }, { status: 401 });
+  const ip = clientIp(req);
+  const now = Date.now();
+  if (!loginAllowed(attempts, ip, now)) {
+    return NextResponse.json({ error: "Terlalu banyak percobaan. Tunggu sebentar." }, { status: 429 });
   }
+  const body = await parseJson(req);
+  const record = typeof body === "object" && body !== null ? (body as Record<string, unknown>) : {};
+  if (!verifyAdminCredentials(record.username, record.password, username, passwordHash)) {
+    recordFailedLogin(attempts, ip, now);
+    return NextResponse.json({ error: "Username atau sandi belum tepat" }, { status: 401 });
+  }
+  attempts.delete(ip);
   const res = NextResponse.json({ ok: true });
-  res.headers.set("Set-Cookie", cookieHeader(createOwnerSession(secret), OWNER_SESSION_MAX_AGE));
+  res.headers.set("Set-Cookie", cookieHeader(createOwnerSession(passwordHash), OWNER_SESSION_MAX_AGE));
   return res;
 }
 
@@ -41,3 +58,5 @@ export async function DELETE() {
   res.headers.set("Set-Cookie", cookieHeader("", 0));
   return res;
 }
+
+export { LOGIN_LIMIT, LOGIN_WINDOW_MS };
