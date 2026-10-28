@@ -6,9 +6,20 @@ import { validateCreateUser } from "@/lib/api/validate";
 import { badRequest, dbUnavailable, parseJson } from "@/lib/api/respond";
 
 export async function GET() {
+  // Daftar publik untuk memilih profil anak: tanpa nama/HP orang tua.
+  // Data orang tua hanya muncul di ringkasan pemilik dan ringkasan anak sendiri.
   try {
     const rows = await db.select().from(users).orderBy(desc(users.createdAt));
-    return NextResponse.json({ users: rows });
+    return NextResponse.json({
+      users: rows.map((u) => ({
+        id: u.id,
+        childName: u.childName,
+        age: u.age,
+        subdistrict: u.subdistrict,
+        readingLevel: u.readingLevel,
+        createdAt: u.createdAt,
+      })),
+    });
   } catch {
     return dbUnavailable();
   }

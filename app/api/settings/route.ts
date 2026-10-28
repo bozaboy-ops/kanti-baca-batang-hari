@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { appSettings } from "@/lib/db/schema";
 import { parseSettings, DEFAULT_SETTINGS } from "@/lib/settings";
 import { dbUnavailable, parseJson } from "@/lib/api/respond";
+import { ownerRequired } from "@/lib/admin/guard";
 
 const KEY = "app";
 
@@ -17,6 +18,8 @@ export async function GET() {
 }
 
 export async function PUT(req: Request) {
+  const denied = ownerRequired(req);
+  if (denied) return denied;
   const body = await parseJson(req);
   const settings = parseSettings(body);
   try {

@@ -103,7 +103,7 @@ export default function HomePage() {
     if (!selectedId) { setCompletedSlugs(new Set()); return; }
     void (async () => {
       try {
-        const res = await fetch("/api/summary");
+        const res = await fetch(`/api/summary?userId=${encodeURIComponent(selectedId)}`);
         const data = await res.json().catch(() => null);
         const entry = Array.isArray(data?.users) ? data.users.find((u: { user: { id: string } }) => u.user.id === selectedId) : null;
         setCompletedSlugs(new Set(entry ? (entry.badges as { slug: string }[]).map((b) => b.slug) : []));

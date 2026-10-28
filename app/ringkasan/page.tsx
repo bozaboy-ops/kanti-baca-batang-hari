@@ -76,7 +76,9 @@ export default function RingkasanPage() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/summary");
+      const storedId = window.localStorage.getItem("bacca.currentUserId");
+      if (!storedId) throw new Error("Pilih profil anak di Beranda dulu, ya.");
+      const res = await fetch(`/api/summary?userId=${encodeURIComponent(storedId)}`);
       const data = await res.json().catch(() => null);
       if (!res.ok) throw new Error(data?.error ?? "Ringkasan belum bisa dimuat");
       setUsers(Array.isArray(data.users) ? data.users : []);

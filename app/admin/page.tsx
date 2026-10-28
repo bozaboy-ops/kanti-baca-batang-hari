@@ -3,11 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { THEMES } from "@/lib/content/themes";
-import { hashPin, isValidPinFormat, verifyPin } from "@/lib/parent/pin";
 import { parseSettings, type AppSettings } from "@/lib/settings";
 
-const OWNER_PIN_KEY = "kanti.ownerPinHash";
-const OWNER_UNLOCK_KEY = "kanti.ownerUnlocked";
 const KECAMATAN = ["Muara Bulian", "Muara Tembesi", "Maro Sebo Ulu", "Maro Sebo Ilir", "Batin XXIV", "Pemayung", "Bajubang", "Mersam"];
 
 interface AdminUser {
@@ -21,11 +18,10 @@ interface AdminEntry {
 }
 
 export default function AdminPage() {
-  const [pinHash, setPinHash] = useState<string | null | undefined>(undefined);
+  const [checking, setChecking] = useState(true);
   const [unlocked, setUnlocked] = useState(false);
-  const [pinInput, setPinInput] = useState("");
-  const [pinConfirm, setPinConfirm] = useState("");
-  const [pinError, setPinError] = useState<string | null>(null);
+  const [keyInput, setKeyInput] = useState("");
+  const [keyError, setKeyError] = useState<string | null>(null);
   const [entries, setEntries] = useState<AdminEntry[]>([]);
   const [settings, setSettings] = useState<AppSettings>({ disabledThemes: [], weeklyTarget: 10 });
   const [loading, setLoading] = useState(false);
@@ -34,8 +30,17 @@ export default function AdminPage() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
-    setPinHash(window.localStorage.getItem(OWNER_PIN_KEY));
-    setUnlocked(window.sessionStorage.getItem(OWNER_UNLOCK_KEY) === "1");
+    void (async () => {
+      try {
+        const res = await fetch("/api/admin/session");
+        const data = await res.json().catch(() => null);
+        setUnlocked(res.ok && data?.ok === true);
+      } catch {
+        setUnlocked(false);
+      } finally {
+        setChecking(false);
+      }
+    })();
   }, []);
 
   const loadAll = useCallback(async () => {
@@ -57,29 +62,29 @@ export default function AdminPage() {
 
   useEffect(() => { if (unlocked) void loadAll(); }, [unlocked, loadAll]);
 
-  function unlock() {
-    window.sessionStorage.setItem(OWNER_UNLOCK_KEY, "1");
-    setUnlocked(true);
+  async function handleUnlock(event: React.FormEvent) {
+    event.preventDefault();
+    setKeyError(null);
+    try {
+      const res = await fetch("/api/admin/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ key: keyInput }),
+      });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.error ?? "Kunci pemilik belum tepat");
+      setKeyInput("");
+      setUnlocked(true);
+    } catch (err) {
+      setKeyError(err instanceof Error ? err.message : "Kunci pemilik belum tepat");
+    }
   }
 
-  function handleSetup(event: React.FormEvent) {
-    event.preventDefault();
-    setPinError(null);
-    if (!isValidPinFormat(pinInput)) { setPinError("PIN pemilik harus 4-6 angka."); return; }
-    if (pinInput !== pinConfirm) { setPinError("PIN dan ulangi PIN belum sama."); return; }
-    const hash = hashPin(pinInput);
-    window.localStorage.setItem(OWNER_PIN_KEY, hash);
-    setPinHash(hash);
-    setPinInput(""); setPinConfirm("");
-    unlock();
-  }
-
-  function handleUnlock(event: React.FormEvent) {
-    event.preventDefault();
-    setPinError(null);
-    if (!verifyPin(pinInput, pinHash)) { setPinError("PIN pemilik belum tepat."); return; }
-    setPinInput("");
-    unlock();
+  async function handleLock() {
+    try {
+      await fetch("/api/admin/session", { method: "DELETE" });
+    } catch { /* sesi lokal tetap dikunci */ }
+    setUnlocked(false);
   }
 
   async function saveProfile(user: AdminUser, patch: Partial<AdminUser>) {
@@ -145,27 +150,21 @@ export default function AdminPage() {
   const totalCompleted = entries.reduce((n, e) => n + e.completedCount, 0);
   const inputClass = "mt-1.5 w-full rounded-xl border border-emerald-900/20 bg-white px-4 py-3 text-emerald-950 focus:border-emerald-600 focus:outline-none";
 
-  if (pinHash === undefined) return <main className="mx-auto max-w-3xl px-4 py-12 text-emerald-800">Menyiapkan admin...</main>;
+  if (checking) return <main className="mx-auto max-w-3xl px-4 py-12 text-emerald-800">Menyiapkan admin...</main>;
 
   if (!unlocked) {
     return (
       <main className="mx-auto w-full max-w-md px-4 py-10 sm:py-14">
         <section className="lux-card rounded-[2rem] p-6 sm:p-8">
           <span className="gold-rule block h-1 w-14 rounded-full" aria-hidden="true" />
-          <h1 className="font-display mt-4 text-3xl font-semibold text-emerald-950">{pinHash ? "Admin Pemilik Terkunci" : "Buat PIN Pemilik"}</h1>
-          <p className="mt-2 text-emerald-800">{pinHash ? "Masukkan PIN pemilik untuk mengelola aplikasi." : "PIN ini berbeda dari PIN orang tua. Simpan baik-baik; ini kunci layar pemilik di perangkat ini, bukan kata sandi akun online."}</p>
-          <form onSubmit={pinHash ? handleUnlock : handleSetup} className="mt-5 space-y-3">
-            <label className="block text-sm font-semibold text-emerald-900">PIN pemilik
-              <input value={pinInput} onChange={(e) => setPinInput(e.target.value.replace(/\D/g, "").slice(0, 6))} inputMode="numeric" type="password" className={inputClass} placeholder="4-6 angka" />
+          <h1 className="font-display mt-4 text-3xl font-semibold text-emerald-950">Admin Pemilik Terkunci</h1>
+          <p className="mt-2 text-emerald-800">Masukkan kunci pemilik untuk mengelola aplikasi. Kunci ini hanya diketahui pemilik dan diperiksa di server — tidak bisa dibuat dari perangkat lain.</p>
+          <form onSubmit={handleUnlock} className="mt-5 space-y-3">
+            <label className="block text-sm font-semibold text-emerald-900">Kunci pemilik
+              <input value={keyInput} onChange={(e) => setKeyInput(e.target.value)} type="password" autoComplete="current-password" className={inputClass} placeholder="Kunci pemilik" />
             </label>
-            {!pinHash && (
-              <label className="block text-sm font-semibold text-emerald-900">Ulangi PIN
-                <input value={pinConfirm} onChange={(e) => setPinConfirm(e.target.value.replace(/\D/g, "").slice(0, 6))} inputMode="numeric" type="password" className={inputClass} />
-              </label>
-            )}
-            {pinError && <p role="alert" className="rounded-xl bg-amber-100 px-4 py-2 text-sm font-medium text-amber-900">{pinError}</p>}
-            <button type="submit" className="w-full rounded-xl bg-emerald-700 px-5 py-3 font-display text-lg font-semibold text-white hover:bg-emerald-800">{pinHash ? "Buka Admin" : "Simpan PIN & Buka Admin"}</button>
-            {pinHash && <button type="button" onClick={() => { window.localStorage.removeItem(OWNER_PIN_KEY); window.sessionStorage.removeItem(OWNER_UNLOCK_KEY); setPinHash(null); setPinInput(""); }} className="w-full rounded-xl border border-amber-500 px-5 py-2.5 text-sm font-semibold text-amber-700 hover:bg-amber-50">Lupa PIN? Atur Ulang di Perangkat Ini</button>}
+            {keyError && <p role="alert" className="rounded-xl bg-amber-100 px-4 py-2 text-sm font-medium text-amber-900">{keyError}</p>}
+            <button type="submit" className="w-full rounded-xl bg-emerald-700 px-5 py-3 font-display text-lg font-semibold text-white hover:bg-emerald-800">Buka Admin</button>
           </form>
           <p className="mt-4 text-center"><Link href="/" className="font-semibold text-emerald-700">Kembali ke Beranda</Link></p>
         </section>
@@ -183,7 +182,7 @@ export default function AdminPage() {
         </div>
         <span className="flex flex-wrap gap-2 print:hidden">
           <button type="button" onClick={exportCsv} className="rounded-full bg-white px-5 py-2.5 font-semibold text-emerald-800 hover:bg-amber-300 hover:text-emerald-950">Unduh CSV Pendaftar</button>
-          <button type="button" onClick={() => { window.sessionStorage.removeItem(OWNER_UNLOCK_KEY); setUnlocked(false); }} className="rounded-full border border-white/50 px-5 py-2.5 font-semibold text-white hover:bg-white/10">Kunci Admin</button>
+          <button type="button" onClick={() => void handleLock()} className="rounded-full border border-white/50 px-5 py-2.5 font-semibold text-white hover:bg-white/10">Kunci Admin</button>
           <Link href="/" className="rounded-full border border-white/50 px-5 py-2.5 font-semibold text-white hover:bg-white/10">Beranda</Link>
         </span>
       </header>

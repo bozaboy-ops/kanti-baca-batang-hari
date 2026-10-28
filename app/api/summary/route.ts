@@ -1,12 +1,23 @@
 import { NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { stories, storyPages, users } from "@/lib/db/schema";
 import { dbUnavailable, normalizeStoredTrickyWords } from "@/lib/api/respond";
+import { ownerRequired } from "@/lib/admin/guard";
 import { computeBadges } from "@/lib/content/badges";
 
-export async function GET() {
+export async function GET(req: Request) {
+  // Tanpa userId: daftar SEMUA anak + data orang tua — hanya pemilik.
+  // Dengan userId: ringkasan satu anak untuk perangkatnya sendiri (id UUID tidak bisa ditebak).
+  const userId = new URL(req.url).searchParams.get("userId");
+  if (!userId) {
+    const denied = ownerRequired(req);
+    if (denied) return denied;
+  }
   try {
-    const allUsers = await db.select().from(users);
+    const allUsers = userId
+      ? await db.select().from(users).where(eq(users.id, userId))
+      : await db.select().from(users);
     const allStories = await db.select().from(stories);
     const allPages = await db.select().from(storyPages);
 

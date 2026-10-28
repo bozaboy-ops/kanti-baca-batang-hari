@@ -22,12 +22,13 @@ export default function LatihanPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch("/api/summary");
+        const stored = window.localStorage.getItem("bacca.currentUserId");
+        if (!stored) throw new Error("Pilih profil anak di Beranda dulu, ya.");
+        const res = await fetch(`/api/summary?userId=${encodeURIComponent(stored)}`);
         const data = await res.json().catch(() => null);
         if (!res.ok) throw new Error(data?.error ?? "Latihan belum bisa dimuat");
         const users = (Array.isArray(data.users) ? data.users : []) as SummaryEntry[];
         setEntries(users);
-        const stored = window.localStorage.getItem("bacca.currentUserId");
         setSelectedId(users.some((u) => u.user.id === stored) ? stored : users[0]?.user.id ?? null);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Latihan belum bisa dimuat");

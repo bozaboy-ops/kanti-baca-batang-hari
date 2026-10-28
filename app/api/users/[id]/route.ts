@@ -5,8 +5,11 @@ import { stories, users } from "@/lib/db/schema";
 import { badRequest, dbUnavailable, notFound, parseJson } from "@/lib/api/respond";
 import { validateCreateUser } from "@/lib/api/validate";
 import { removeStoryStorage } from "@/lib/api/storage";
+import { ownerRequired } from "@/lib/admin/guard";
 
-export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: Request, ctx: { params: Promise<{ id: string }> }) {
+  const denied = ownerRequired(req);
+  if (denied) return denied;
   const { id } = await ctx.params;
   let storyIds: string[] = [];
   try {
@@ -25,6 +28,8 @@ export async function DELETE(_req: Request, ctx: { params: Promise<{ id: string 
   return NextResponse.json({ ok: true });
 }
 export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
+  const denied = ownerRequired(req);
+  if (denied) return denied;
   const { id } = await ctx.params;
   const body = await parseJson(req);
   const v = validateCreateUser(body);
